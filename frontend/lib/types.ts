@@ -49,11 +49,18 @@ export interface CategoryInfo {
   icon: string;
 }
 
+export interface ScannedProduct {
+  name: string;
+  quantity: number;
+  category: string;
+  confidence: number;
+}
+
 export interface ScanProgress {
   stage: string;
   progress: number;
   message: string;
-  products: ProductResponse[];
+  products: ScannedProduct[];
   added_ids: number[];
 }
 

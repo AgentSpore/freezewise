@@ -9,18 +9,19 @@ import Toast from "@/components/toast";
 import { initializeStores, useThemeStore } from "@/lib/store";
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
-  const effectiveTheme = useThemeStore((s) => s.effectiveTheme);
+  const theme = useThemeStore((s) => s.theme);
+  const themeOverride = useThemeStore((s) => s.themeOverride);
 
   // Initialize stores from localStorage on mount
   useEffect(() => {
     initializeStores();
   }, []);
 
-  // Apply theme to html element
+  // Apply theme to html element — reacts to theme/themeOverride changes
   useEffect(() => {
-    const theme = effectiveTheme();
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [effectiveTheme]);
+    const effective = themeOverride ?? theme;
+    document.documentElement.setAttribute("data-theme", effective);
+  }, [theme, themeOverride]);
 
   return (
     <>
