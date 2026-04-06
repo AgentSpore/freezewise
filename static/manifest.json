@@ -1,0 +1,11 @@
+{
+    "name": "FreezeWise",
+    "short_name": "FreezeWise",
+    "description": "AI-powered food storage guide and smart fridge manager",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#FAFAFA",
+    "theme_color": "#FAFAFA",
+    "orientation": "portrait-primary",
+    "icons": []
+}

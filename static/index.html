@@ -1,0 +1,3227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<meta name="theme-color" content="#FAFAFA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="FreezeWise — AI-powered food storage guide and smart fridge manager">
+<title>FreezeWise</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/static/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   FreezeWise — Editorial Magazine Design
+   Production UI — Single-file SPA
+   ============================================================ */
+
+/* === Reset === */
+*, *::before, *::after {
+  margin: 0; padding: 0; box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* === CSS Custom Properties === */
+:root {
+  --bg: #FAFAFA;
+  --bg-white: #FFFFFF;
+  --text: #111111;
+  --text-secondary: #555555;
+  --text-tertiary: #999999;
+  --border: #E5E5E5;
+  --border-dark: #111111;
+  --accent: #111111;
+  --accent-tint: transparent;
+  --red: #D32F2F;
+  --orange: #E65100;
+  --green: #2E7D32;
+  --blue: #1565C0;
+  --radius: 0px;
+  --nav-height: 68px;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition-speed: 0.35s;
+}
+
+/* === Theme: Green Garden === */
+[data-theme="green"] {
+  --accent: #2D6A4F;
+  --accent-tint: rgba(45, 106, 79, 0.04);
+}
+
+/* === Theme: Warm Kitchen === */
+[data-theme="warm"] {
+  --accent: #8B5E3C;
+  --accent-tint: rgba(139, 94, 60, 0.04);
+}
+
+/* === Theme: Fruity Fresh === */
+[data-theme="colorful"] {
+  --accent: #D35400;
+  --accent-tint: rgba(211, 84, 0, 0.04);
+}
+
+/* === Theme: Neutral Clean === */
+[data-theme="neutral"] {
+  --accent: #111111;
+  --accent-tint: transparent;
+}
+
+/* === Body === */
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  max-width: 600px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: calc(var(--nav-height) + 24px);
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--transition-speed), color var(--transition-speed);
+}
+
+/* === Masthead === */
+.masthead {
+  padding: 52px 20px 0;
+  border-bottom: 3px solid var(--text);
+  position: relative;
+  background: var(--accent-tint);
+  transition: background var(--transition-speed);
+}
+
+.masthead-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.masthead-date {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 500;
+}
+
+.masthead-issue {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 500;
+}
+
+.logo-text {
+  font-family: var(--serif);
+  font-size: 38px;
+  text-align: center;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  padding: 8px 0;
+}
+
+.masthead-tagline {
+  text-align: center;
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  padding-bottom: 12px;
+  font-weight: 400;
+  transition: color var(--transition-speed);
+}
+
+/* === Screen Container === */
+.screen {
+  display: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.screen.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* === Search Section === */
+.search-section {
+  padding: 16px 20px 12px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--text);
+  padding: 10px 14px;
+  gap: 10px;
+  transition: all 0.2s;
+  background: var(--bg);
+}
+
+.search-bar:focus-within {
+  background: var(--bg-white);
+  border-color: var(--accent);
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+}
+
+.search-bar input::placeholder {
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 11px;
+}
+
+.search-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  border-left: 1.5px solid var(--accent);
+  padding-left: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--transition-speed);
+}
+
+/* === Categories === */
+.categories {
+  padding: 0 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.categories-scroll {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.categories-scroll::-webkit-scrollbar { display: none; }
+
+.cat-tab {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.cat-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 700;
+}
+
+.cat-tab:hover:not(.active) {
+  color: var(--text-secondary);
+}
+
+/* === Section Header === */
+.section-header {
+  padding: 20px 20px 4px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.section-count {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* === Product Cards === */
+.products-list {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-card {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.product-card:last-child { border-bottom: none; }
+
+.product-card:active {
+  background: rgba(0,0,0,0.02);
+}
+
+.card-row-1 {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.card-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.product-num {
+  font-family: var(--serif);
+  font-size: 32px;
+  color: var(--border);
+  line-height: 1;
+  min-width: 28px;
+  flex-shrink: 0;
+}
+
+.product-emoji {
+  font-size: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.product-name {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border: 1px solid;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.card-badge.fresh { color: var(--green); border-color: var(--green); }
+.card-badge.expiring { color: var(--orange); border-color: var(--orange); }
+.card-badge.expired { color: var(--red); border-color: var(--red); background: rgba(211,47,47,0.05); }
+.card-badge.ok { color: var(--blue); border-color: var(--blue); }
+
+.card-row-2 {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 8px;
+  padding-left: 42px;
+}
+
+.storage-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.storage-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  margin-bottom: 1px;
+}
+
+.storage-value {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.product-tip {
+  padding-left: 42px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.add-to-fridge-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  margin-left: 42px;
+  margin-top: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  background: none;
+  border: 1.5px solid var(--accent);
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.15s;
+}
+
+.add-to-fridge-btn:hover {
+  background: var(--accent);
+  color: var(--bg-white);
+}
+
+.add-to-fridge-btn:active {
+  transform: scale(0.97);
+}
+
+/* === Pull Quote === */
+.pull-quote {
+  padding: 20px 20px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin: 4px 0;
+}
+
+.pull-quote-text {
+  font-family: var(--serif);
+  font-size: 20px;
+  color: var(--text);
+  font-style: italic;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
+}
+
+.pull-quote-attr {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* === Loading Skeleton === */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.skeleton-card {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.skeleton-line {
+  height: 14px;
+  margin-bottom: 8px;
+}
+
+.skeleton-line.w60 { width: 60%; }
+.skeleton-line.w40 { width: 40%; }
+.skeleton-line.w80 { width: 80%; }
+.skeleton-line.w30 { width: 30%; }
+.skeleton-line.h24 { height: 24px; }
+.skeleton-line.h18 { height: 18px; }
+
+/* === Search Loading & Empty States === */
+.state-message {
+  padding: 48px 20px;
+  text-align: center;
+}
+
+.state-message-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.state-message-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.state-message-desc {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* === Error Toast === */
+.toast {
+  position: fixed;
+  top: 56px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--red);
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  z-index: 9999;
+  max-width: 360px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.toast.visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.success {
+  background: var(--green);
+}
+
+/* === Camera FAB === */
+.camera-fab {
+  position: fixed;
+  bottom: calc(var(--nav-height) + 32px);
+  right: calc(50% - 280px);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--bg);
+  border: none;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 100;
+  transition: transform 0.15s, opacity 0.2s;
+}
+
+.camera-fab:active { transform: scale(0.93); }
+.camera-fab.hidden { opacity: 0; pointer-events: none; }
+
+@media (max-width: 600px) {
+  .camera-fab {
+    right: 20px;
+  }
+}
+
+/* === Bottom Navigation === */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 600px;
+  background: var(--bg-white);
+  border-top: 2px solid var(--text);
+  display: flex;
+  padding: 0 0 env(safe-area-inset-bottom, 0px);
+  z-index: 200;
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 0 8px;
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  background: none;
+  border: none;
+  font-family: inherit;
+  transition: color 0.15s;
+}
+
+.nav-item:not(:last-child) {
+  border-right: 1px solid var(--border);
+}
+
+.nav-item .nav-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-family: var(--sans);
+}
+
+.nav-item .nav-icon { font-size: 18px; line-height: 1; }
+
+.nav-item.active { color: var(--accent); }
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  transition: background var(--transition-speed);
+}
+
+.nav-item:not(.active) { color: var(--text-tertiary); }
+
+.nav-badge {
+  position: absolute;
+  top: 4px;
+  right: calc(50% - 18px);
+  background: var(--red);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+.nav-badge:empty { display: none; }
+
+/* === Horizontal Rules === */
+.rule { width: 100%; height: 1px; background: var(--border); }
+.rule.thick { height: 3px; background: var(--text); }
+
+/* ============================
+   SCREEN: MY FRIDGE
+   ============================ */
+
+.fridge-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.fridge-stat {
+  padding: 16px 12px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+
+.fridge-stat:last-child { border-right: none; }
+
+.fridge-stat-value {
+  font-family: var(--serif);
+  font-size: 28px;
+  color: var(--text);
+  line-height: 1;
+}
+
+.fridge-stat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.fridge-stat-value.warn { color: var(--orange); }
+.fridge-stat-value.danger { color: var(--red); }
+
+.fridge-theme-bar {
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.theme-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  transition: background var(--transition-speed);
+}
+
+.theme-name {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.fridge-items {
+  padding: 0 20px;
+}
+
+.fridge-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 14px;
+  position: relative;
+}
+
+.fridge-item-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.fridge-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.fridge-item-name {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.fridge-item-meta {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  display: flex;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.fridge-item-location {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+.fridge-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.fridge-days-left {
+  font-family: var(--serif);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.fridge-days-left.fresh { color: var(--green); }
+.fridge-days-left.expiring { color: var(--orange); }
+.fridge-days-left.expired { color: var(--red); }
+
+.fridge-days-unit {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.fridge-remove-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-tertiary);
+  font-size: 14px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.fridge-remove-btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.fridge-empty {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.fridge-empty-icon { font-size: 64px; margin-bottom: 16px; }
+
+.fridge-empty-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.fridge-empty-desc {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+}
+
+/* ============================
+   SCREEN: RECIPES
+   ============================ */
+
+.recipes-header {
+  padding: 20px;
+}
+
+.recipes-generate-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--text);
+  color: var(--bg-white);
+  border: none;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.recipes-generate-btn:hover {
+  opacity: 0.9;
+}
+
+.recipes-generate-btn:active {
+  transform: scale(0.99);
+}
+
+.recipes-generate-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.recipes-list {
+  padding: 0 20px;
+}
+
+.recipe-card {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.recipe-card:last-child { border-bottom: none; }
+
+.recipe-num {
+  font-family: var(--serif);
+  font-size: 32px;
+  color: var(--border);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.recipe-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+.recipe-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.recipe-meta-item {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+.recipe-section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  margin-bottom: 6px;
+  margin-top: 12px;
+}
+
+.recipe-ingredients {
+  list-style: none;
+  padding: 0;
+}
+
+.recipe-ingredients li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  padding-left: 16px;
+  position: relative;
+}
+
+.recipe-ingredients li::before {
+  content: '\2014';
+  position: absolute;
+  left: 0;
+  color: var(--text-tertiary);
+}
+
+.recipe-steps {
+  list-style: none;
+  padding: 0;
+  counter-reset: step;
+}
+
+.recipe-steps li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-left: 28px;
+  position: relative;
+  margin-bottom: 6px;
+  counter-increment: step;
+}
+
+.recipe-steps li::before {
+  content: counter(step) '.';
+  position: absolute;
+  left: 0;
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--accent);
+  font-weight: 400;
+}
+
+.recipe-uses-expiring {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--orange);
+  border: 1px solid var(--orange);
+  padding: 3px 8px;
+}
+
+.recipes-loading {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.recipes-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.recipes-loading-text {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-tertiary);
+}
+
+/* ============================
+   SCREEN: SETTINGS
+   ============================ */
+
+.settings-section {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.settings-row-label {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.settings-row-value {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.lang-selector {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--text);
+}
+
+.lang-btn {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  font-family: var(--sans);
+  color: var(--text-tertiary);
+  transition: all 0.15s;
+}
+
+.lang-btn:last-child { border-right: none; }
+
+.lang-btn.active {
+  background: var(--text);
+  color: var(--bg-white);
+}
+
+.theme-selector {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--text);
+  margin-top: 8px;
+}
+
+.theme-btn {
+  flex: 1;
+  padding: 10px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  font-family: var(--sans);
+  color: var(--text-tertiary);
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.theme-btn:last-child { border-right: none; }
+
+.theme-btn.active {
+  background: var(--accent);
+  color: var(--bg-white);
+}
+
+.settings-about {
+  padding: 20px;
+}
+
+.settings-about-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.settings-about-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.settings-about-version {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-top: 12px;
+}
+
+/* ============================
+   MODAL: Product Detail
+   ============================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 500;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.modal-overlay.visible {
+  display: block;
+  opacity: 1;
+}
+
+.modal-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  width: 100%;
+  max-width: 600px;
+  max-height: 85dvh;
+  background: var(--bg-white);
+  z-index: 501;
+  border-top: 3px solid var(--text);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.modal-sheet.visible {
+  transform: translateX(-50%) translateY(0);
+}
+
+.modal-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 10px auto 0;
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  background: var(--bg-white);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  z-index: 10;
+}
+
+.detail-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.detail-emoji {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.detail-name {
+  font-family: var(--serif);
+  font-size: 32px;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.detail-names-i18n {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.6;
+}
+
+.detail-category {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 3px 10px;
+}
+
+.detail-freeze-badge {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border: 1px solid;
+}
+
+.detail-freeze-badge.yes { color: var(--green); border-color: var(--green); }
+.detail-freeze-badge.no { color: var(--red); border-color: var(--red); }
+
+.detail-storage {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-storage-cell {
+  padding: 16px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+}
+
+.detail-storage-cell:last-child { border-right: none; }
+
+.detail-storage-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.detail-storage-value {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--text);
+}
+
+.detail-section {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.detail-section-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.detail-tip {
+  font-style: italic;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-tip:last-child { border-bottom: none; }
+
+.detail-spoilage li {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  padding-left: 16px;
+  position: relative;
+  list-style: none;
+}
+
+.detail-spoilage li::before {
+  content: '!';
+  position: absolute;
+  left: 0;
+  color: var(--red);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.detail-add-section {
+  padding: 16px 20px 32px;
+}
+
+.detail-location-selector {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--text);
+  margin-bottom: 12px;
+}
+
+.detail-loc-btn {
+  flex: 1;
+  padding: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  font-family: var(--sans);
+  color: var(--text-tertiary);
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.detail-loc-btn:last-child { border-right: none; }
+
+.detail-loc-btn.active {
+  background: var(--text);
+  color: var(--bg-white);
+}
+
+.detail-add-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  color: var(--bg-white);
+  border: none;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.detail-add-btn:hover { opacity: 0.9; }
+.detail-add-btn:active { transform: scale(0.99); }
+
+/* ============================
+   MODAL: Photo Scan
+   ============================ */
+
+.scan-modal-content {
+  padding: 20px;
+}
+
+.scan-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.scan-subtitle {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
+}
+
+.scan-capture-area {
+  border: 2px dashed var(--border);
+  padding: 40px 20px;
+  text-align: center;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.scan-capture-area:hover {
+  border-color: var(--text-tertiary);
+}
+
+.scan-capture-area.has-image {
+  border-style: solid;
+  border-color: var(--accent);
+  padding: 0;
+}
+
+.scan-capture-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.scan-capture-text {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.scan-preview-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: none;
+}
+
+.scan-capture-area.has-image .scan-preview-img { display: block; }
+.scan-capture-area.has-image .scan-capture-icon,
+.scan-capture-area.has-image .scan-capture-text { display: none; }
+
+.scan-file-input {
+  display: none;
+}
+
+.scan-analyze-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--text);
+  color: var(--bg-white);
+  border: none;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 16px;
+}
+
+.scan-analyze-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.scan-progress {
+  display: none;
+  padding: 16px 0;
+  text-align: center;
+}
+
+.scan-progress.active { display: block; }
+
+.scan-progress-text {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--text-secondary);
+  margin-top: 12px;
+}
+
+.scan-results {
+  display: none;
+}
+
+.scan-results.active { display: block; }
+
+.scan-results-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.scan-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.scan-item-check {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+}
+
+.scan-item-emoji { font-size: 24px; }
+
+.scan-item-name {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.scan-add-all-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--accent);
+  color: var(--bg-white);
+  border: none;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: all 0.15s;
+}
+
+.scan-coming-soon {
+  padding: 32px 0;
+  text-align: center;
+}
+
+.scan-coming-soon-icon { font-size: 40px; margin-bottom: 8px; }
+
+.scan-coming-soon-text {
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.scan-coming-soon-desc {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+/* === Quantity Selector (inline) === */
+.qty-selector {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--border);
+  margin-left: 8px;
+}
+
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn:hover { background: var(--border); }
+
+.qty-value {
+  width: 28px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  height: 28px;
+  line-height: 28px;
+}
+
+/* === Responsive === */
+@media (min-width: 480px) {
+  .logo-text { font-size: 44px; }
+  .product-name { font-size: 24px; }
+  .detail-name { font-size: 36px; }
+}
+
+@media (min-width: 600px) {
+  body { padding-left: 0; padding-right: 0; }
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); }
+
+/* === Animation helpers === */
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body data-theme="neutral">
+
+<!-- ======== TOAST ======== -->
+<div id="toast" class="toast"></div>
+
+<!-- ======== MASTHEAD ======== -->
+<header class="masthead" id="masthead">
+  <div class="masthead-top">
+    <span class="masthead-date" id="mastheadDate"></span>
+    <span class="masthead-issue" id="mastheadIssue"></span>
+  </div>
+  <h1 class="logo-text">FreezeWise</h1>
+  <p class="masthead-tagline" id="mastheadTagline"></p>
+</header>
+
+<!-- ============================================================
+     SCREEN: SEARCH
+     ============================================================ -->
+<section class="screen active" id="screenSearch">
+
+  <div class="search-section">
+    <div class="search-bar">
+      <input type="text" id="searchInput" autocomplete="off">
+      <span class="search-label" id="searchBtn"></span>
+    </div>
+  </div>
+
+  <div class="categories" id="categoriesWrap">
+    <div class="categories-scroll" id="categoriesScroll"></div>
+  </div>
+
+  <div class="section-header" id="searchSectionHeader">
+    <span class="section-label" id="searchResultLabel"></span>
+    <span class="section-count" id="searchResultCount"></span>
+  </div>
+
+  <div id="searchSkeletons" class="products-list" style="display:none">
+    <div class="skeleton-card"><div class="skeleton skeleton-line h24 w60"></div><div class="skeleton skeleton-line w80" style="margin-top:12px"></div><div class="skeleton skeleton-line w40" style="margin-top:8px"></div></div>
+    <div class="skeleton-card"><div class="skeleton skeleton-line h24 w60"></div><div class="skeleton skeleton-line w80" style="margin-top:12px"></div><div class="skeleton skeleton-line w40" style="margin-top:8px"></div></div>
+    <div class="skeleton-card"><div class="skeleton skeleton-line h24 w60"></div><div class="skeleton skeleton-line w80" style="margin-top:12px"></div><div class="skeleton skeleton-line w40" style="margin-top:8px"></div></div>
+  </div>
+
+  <div id="searchEmpty" class="state-message" style="display:none">
+    <div class="state-message-icon">🔍</div>
+    <div class="state-message-title" data-i18n="search.emptyTitle"></div>
+    <div class="state-message-desc" data-i18n="search.emptyDesc"></div>
+  </div>
+
+  <div id="searchError" class="state-message" style="display:none">
+    <div class="state-message-icon">⚠️</div>
+    <div class="state-message-title" data-i18n="search.errorTitle"></div>
+    <div class="state-message-desc" data-i18n="search.errorDesc"></div>
+  </div>
+
+  <section class="products-list" id="productsList"></section>
+
+  <div class="pull-quote" id="pullQuote">
+    <p class="pull-quote-text" data-i18n="search.pullQuote"></p>
+    <p class="pull-quote-attr" data-i18n="search.pullQuoteAttr"></p>
+  </div>
+
+</section>
+
+<!-- ============================================================
+     SCREEN: MY FRIDGE
+     ============================================================ -->
+<section class="screen" id="screenFridge">
+
+  <div class="section-header">
+    <span class="section-label" data-i18n="fridge.title"></span>
+  </div>
+
+  <div class="fridge-stats" id="fridgeStats">
+    <div class="fridge-stat">
+      <div class="fridge-stat-value" id="statTotal">0</div>
+      <div class="fridge-stat-label" data-i18n="fridge.total"></div>
+    </div>
+    <div class="fridge-stat">
+      <div class="fridge-stat-value warn" id="statExpiring">0</div>
+      <div class="fridge-stat-label" data-i18n="fridge.expiring"></div>
+    </div>
+    <div class="fridge-stat">
+      <div class="fridge-stat-value danger" id="statExpired">0</div>
+      <div class="fridge-stat-label" data-i18n="fridge.expired"></div>
+    </div>
+  </div>
+
+  <div class="fridge-theme-bar" id="fridgeThemeBar">
+    <div class="theme-dot"></div>
+    <span class="theme-name" id="fridgeThemeName"></span>
+  </div>
+
+  <div id="fridgeSkeletons" style="display:none;padding:0 20px">
+    <div class="skeleton-card"><div class="skeleton skeleton-line h18 w60"></div><div class="skeleton skeleton-line w40" style="margin-top:8px"></div></div>
+    <div class="skeleton-card"><div class="skeleton skeleton-line h18 w60"></div><div class="skeleton skeleton-line w40" style="margin-top:8px"></div></div>
+  </div>
+
+  <div id="fridgeEmpty" class="fridge-empty" style="display:none">
+    <div class="fridge-empty-icon">🧊</div>
+    <div class="fridge-empty-title" data-i18n="fridge.emptyTitle"></div>
+    <div class="fridge-empty-desc" data-i18n="fridge.emptyDesc"></div>
+  </div>
+
+  <div class="fridge-items" id="fridgeItemsList"></div>
+
+</section>
+
+<!-- ============================================================
+     SCREEN: RECIPES
+     ============================================================ -->
+<section class="screen" id="screenRecipes">
+
+  <div class="section-header">
+    <span class="section-label" data-i18n="recipes.title"></span>
+  </div>
+
+  <div class="recipes-header">
+    <button class="recipes-generate-btn" id="generateRecipesBtn" data-i18n="recipes.generate"></button>
+  </div>
+
+  <div id="recipesLoading" class="recipes-loading" style="display:none">
+    <div class="recipes-loading-spinner"></div>
+    <div class="recipes-loading-text" data-i18n="recipes.loading"></div>
+  </div>
+
+  <div id="recipesEmpty" class="state-message" style="display:none">
+    <div class="state-message-icon">🍳</div>
+    <div class="state-message-title" data-i18n="recipes.emptyTitle"></div>
+    <div class="state-message-desc" data-i18n="recipes.emptyDesc"></div>
+  </div>
+
+  <div class="recipes-list" id="recipesList"></div>
+
+</section>
+
+<!-- ============================================================
+     SCREEN: SETTINGS
+     ============================================================ -->
+<section class="screen" id="screenSettings">
+
+  <div class="section-header">
+    <span class="section-label" data-i18n="settings.title"></span>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-label" data-i18n="settings.language"></div>
+    <div class="lang-selector" id="langSelector">
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="ru">RU</button>
+      <button class="lang-btn" data-lang="cn">CN</button>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-label" data-i18n="settings.theme"></div>
+    <div class="settings-row">
+      <span class="settings-row-label" data-i18n="settings.currentTheme"></span>
+      <span class="settings-row-value" id="settingsCurrentTheme">Neutral Clean</span>
+    </div>
+    <div class="theme-selector" id="themeSelector">
+      <button class="theme-btn" data-theme="auto" data-i18n="settings.themeAuto"></button>
+      <button class="theme-btn" data-theme="green" data-i18n="settings.themeGreen"></button>
+      <button class="theme-btn" data-theme="warm" data-i18n="settings.themeWarm"></button>
+      <button class="theme-btn" data-theme="colorful" data-i18n="settings.themeFruity"></button>
+      <button class="theme-btn" data-theme="neutral" data-i18n="settings.themeNeutral"></button>
+    </div>
+  </div>
+
+  <div class="settings-about">
+    <div class="settings-about-title">FreezeWise</div>
+    <div class="settings-about-text" data-i18n="settings.aboutText"></div>
+    <div class="settings-about-version">v1.0.0 &mdash; Editorial Magazine Edition</div>
+  </div>
+
+</section>
+
+<!-- ============================================================
+     MODAL: Product Detail
+     ============================================================ -->
+<div class="modal-overlay" id="detailOverlay"></div>
+<div class="modal-sheet" id="detailSheet">
+  <div class="modal-handle"></div>
+  <button class="modal-close" id="detailClose">&times;</button>
+
+  <div class="detail-header" id="detailHeader">
+    <div class="detail-emoji" id="detailEmoji"></div>
+    <div class="detail-name" id="detailName"></div>
+    <div class="detail-names-i18n" id="detailNamesI18n"></div>
+    <div style="margin-top:8px">
+      <span class="detail-category" id="detailCategory"></span>
+      <span class="detail-freeze-badge" id="detailFreezeBadge"></span>
+    </div>
+  </div>
+
+  <div class="detail-storage" id="detailStorage">
+    <div class="detail-storage-cell">
+      <div class="detail-storage-label" data-i18n="detail.freezer"></div>
+      <div class="detail-storage-value" id="detailFreezer"></div>
+    </div>
+    <div class="detail-storage-cell">
+      <div class="detail-storage-label" data-i18n="detail.fridge"></div>
+      <div class="detail-storage-value" id="detailFridge"></div>
+    </div>
+    <div class="detail-storage-cell">
+      <div class="detail-storage-label" data-i18n="detail.pantry"></div>
+      <div class="detail-storage-value" id="detailPantry"></div>
+    </div>
+  </div>
+
+  <div class="detail-section" id="detailFreezeHow" style="display:none">
+    <div class="detail-section-label" data-i18n="detail.freezeHow"></div>
+    <div class="detail-section-text" id="detailFreezeHowText"></div>
+  </div>
+
+  <div class="detail-section" id="detailThawHow" style="display:none">
+    <div class="detail-section-label" data-i18n="detail.thawHow"></div>
+    <div class="detail-section-text" id="detailThawHowText"></div>
+  </div>
+
+  <div class="detail-section" id="detailSpoilage" style="display:none">
+    <div class="detail-section-label" data-i18n="detail.spoilage"></div>
+    <ul class="detail-spoilage" id="detailSpoilageList"></ul>
+  </div>
+
+  <div class="detail-section" id="detailTips" style="display:none">
+    <div class="detail-section-label" data-i18n="detail.tips"></div>
+    <div id="detailTipsList"></div>
+  </div>
+
+  <div class="detail-add-section">
+    <div class="detail-section-label" data-i18n="detail.addToFridge"></div>
+    <div class="detail-location-selector" id="detailLocationSelector">
+      <button class="detail-loc-btn active" data-loc="fridge" data-i18n="detail.locFridge"></button>
+      <button class="detail-loc-btn" data-loc="freezer" data-i18n="detail.locFreezer"></button>
+      <button class="detail-loc-btn" data-loc="pantry" data-i18n="detail.locPantry"></button>
+    </div>
+    <button class="detail-add-btn" id="detailAddBtn" data-i18n="detail.addBtn"></button>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL: Photo Scan
+     ============================================================ -->
+<div class="modal-overlay" id="scanOverlay"></div>
+<div class="modal-sheet" id="scanSheet">
+  <div class="modal-handle"></div>
+  <button class="modal-close" id="scanClose">&times;</button>
+
+  <div class="scan-modal-content">
+    <div class="scan-title" data-i18n="scan.title"></div>
+    <div class="scan-subtitle" data-i18n="scan.subtitle"></div>
+
+    <div class="scan-capture-area" id="scanCaptureArea">
+      <div class="scan-capture-icon">📷</div>
+      <div class="scan-capture-text" data-i18n="scan.captureText"></div>
+      <img class="scan-preview-img" id="scanPreview" alt="">
+    </div>
+    <input type="file" class="scan-file-input" id="scanFileInput" accept="image/*" capture="environment">
+
+    <button class="scan-analyze-btn" id="scanAnalyzeBtn" disabled data-i18n="scan.analyzeBtn"></button>
+
+    <div class="scan-progress" id="scanProgress">
+      <div class="recipes-loading-spinner"></div>
+      <div class="scan-progress-text" id="scanProgressText"></div>
+    </div>
+
+    <div class="scan-results" id="scanResults">
+      <div class="scan-results-title" data-i18n="scan.resultsTitle"></div>
+      <div id="scanItemsList"></div>
+      <button class="scan-add-all-btn" id="scanAddAllBtn" data-i18n="scan.addAll"></button>
+    </div>
+
+    <div class="scan-coming-soon" id="scanComingSoon" style="display:none">
+      <div class="scan-coming-soon-icon">🔬</div>
+      <div class="scan-coming-soon-text" data-i18n="scan.comingSoonTitle"></div>
+      <div class="scan-coming-soon-desc" data-i18n="scan.comingSoonDesc"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ======== Camera FAB ======== -->
+<button class="camera-fab" id="cameraFab" aria-label="Scan food">📷</button>
+
+<!-- ======== Bottom Navigation ======== -->
+<nav class="bottom-nav" id="bottomNav">
+  <button class="nav-item active" data-screen="search">
+    <span class="nav-icon">🔍</span>
+    <span class="nav-label" data-i18n="nav.search"></span>
+  </button>
+  <button class="nav-item" data-screen="fridge">
+    <span class="nav-icon">🧊</span>
+    <span class="nav-label" data-i18n="nav.fridge"></span>
+    <span class="nav-badge" id="fridgeBadge"></span>
+  </button>
+  <button class="nav-item" data-screen="recipes">
+    <span class="nav-icon">🍳</span>
+    <span class="nav-label" data-i18n="nav.recipes"></span>
+  </button>
+  <button class="nav-item" data-screen="settings">
+    <span class="nav-icon">⚙️</span>
+    <span class="nav-label" data-i18n="nav.settings"></span>
+  </button>
+</nav>
+
+<!-- ============================================================
+     JAVASCRIPT — Application Logic
+     ============================================================ -->
+<script>
+(function() {
+'use strict';
+
+/* ============================================================
+   i18n TRANSLATIONS
+   ============================================================ */
+const I18N = {
+  en: {
+    nav: { search: 'Search', fridge: 'Fridge', recipes: 'Recipes', settings: 'Settings' },
+    masthead: {
+      tagline: 'The AI Food Storage Guide',
+      taglineGreen: 'The Green Garden Edition',
+      taglineWarm: 'The Warm Kitchen Edition',
+      taglineColorful: 'The Fruity Fresh Edition',
+      taglineNeutral: 'The AI Food Storage Guide',
+      issue: 'Digital Edition'
+    },
+    search: {
+      placeholder: 'Search any food...',
+      btn: 'AI Search',
+      resultLabel: 'Results',
+      emptyTitle: 'No Results',
+      emptyDesc: 'Try searching for a food item like "chicken" or "broccoli"',
+      errorTitle: 'Connection Error',
+      errorDesc: 'Could not reach the server. Please check your connection and try again.',
+      pullQuote: '"The fridge is not a time machine \u2014 it merely slows down the inevitable."',
+      pullQuoteAttr: 'FreezeWise Food Science'
+    },
+    categories: { all: 'All', vegetables: 'Vegetables', protein: 'Protein', dairy: 'Dairy', fruits: 'Fruits', grains: 'Grains', seafood: 'Seafood', herbs: 'Herbs', baked: 'Baked', other: 'Other' },
+    product: {
+      freezer: 'Freezer', fridge: 'Fridge', pantry: 'Pantry',
+      months: 'mo', days: 'days', weeks: 'wks', hours: 'hrs', na: 'N/A',
+      addToFridge: '+ Fridge',
+      daysLeft: 'days',
+      expired: 'Expired'
+    },
+    fridge: {
+      title: 'My Fridge',
+      total: 'Total',
+      expiring: 'Expiring',
+      expired: 'Expired',
+      emptyTitle: 'Your Fridge is Empty',
+      emptyDesc: 'Search for food items and add them to your fridge to track freshness.',
+      location: { fridge: 'Fridge', freezer: 'Freezer', pantry: 'Pantry' },
+      qty: 'Qty'
+    },
+    recipes: {
+      title: 'Recipes',
+      generate: 'Generate Recipes from Expiring Items',
+      loading: 'AI is cooking up recipes...',
+      emptyTitle: 'No Recipes Yet',
+      emptyDesc: 'Add items to your fridge first, then generate AI recipes from expiring ingredients.',
+      time: 'min',
+      ingredients: 'Ingredients',
+      steps: 'Steps',
+      usesExpiring: 'Uses Expiring'
+    },
+    settings: {
+      title: 'Settings',
+      language: 'Language',
+      theme: 'Theme',
+      currentTheme: 'Current theme',
+      themeAuto: 'Auto',
+      themeGreen: 'Green',
+      themeWarm: 'Warm',
+      themeFruity: 'Fruity',
+      themeNeutral: 'Neutral',
+      aboutText: 'FreezeWise is an AI-powered food storage guide that helps you reduce food waste. Search any food to learn optimal storage methods, track items in your fridge, and get recipes for ingredients before they expire.'
+    },
+    detail: {
+      freezer: 'Freezer', fridge: 'Fridge', pantry: 'Pantry',
+      freezeHow: 'How to Freeze', thawHow: 'How to Thaw',
+      spoilage: 'Spoilage Signs', tips: 'Storage Tips',
+      addToFridge: 'Add to My Fridge',
+      locFridge: 'Fridge', locFreezer: 'Freezer', locPantry: 'Pantry',
+      addBtn: 'Add to Fridge',
+      canFreeze: 'Freezable', cannotFreeze: 'Not Freezable'
+    },
+    scan: {
+      title: 'Photo Scan',
+      subtitle: 'Identify food items with AI',
+      captureText: 'Tap to take photo or upload',
+      analyzeBtn: 'Analyze Photo',
+      analyzing: 'Analyzing photo...',
+      found: 'Found items',
+      resultsTitle: 'Detected Items',
+      addAll: 'Add Selected to Fridge',
+      comingSoonTitle: 'Coming Soon',
+      comingSoonDesc: 'Photo scanning will be available in a future update. Stay tuned!'
+    },
+    themes: {
+      green: 'Green Garden',
+      warm: 'Warm Kitchen',
+      colorful: 'Fruity Fresh',
+      neutral: 'Neutral Clean',
+      auto: 'Auto'
+    },
+    toast: {
+      added: 'Added to fridge',
+      removed: 'Removed from fridge',
+      error: 'Something went wrong'
+    }
+  },
+  ru: {
+    nav: { search: 'Поиск', fridge: 'Холод.', recipes: 'Рецепты', settings: 'Настр.' },
+    masthead: {
+      tagline: 'AI-гид по хранению еды',
+      taglineGreen: 'Издание зелёного сада',
+      taglineWarm: 'Издание тёплой кухни',
+      taglineColorful: 'Фруктовое издание',
+      taglineNeutral: 'AI-гид по хранению еды',
+      issue: 'Цифровое издание'
+    },
+    search: {
+      placeholder: 'Найти продукт...',
+      btn: 'AI Поиск',
+      resultLabel: 'Результаты',
+      emptyTitle: 'Ничего не найдено',
+      emptyDesc: 'Попробуйте найти продукт, например "курица" или "брокколи"',
+      errorTitle: 'Ошибка соединения',
+      errorDesc: 'Не удалось связаться с сервером. Проверьте подключение и попробуйте снова.',
+      pullQuote: '"\u0425\u043e\u043b\u043e\u0434\u0438\u043b\u044c\u043d\u0438\u043a \u2014 \u043d\u0435 \u043c\u0430\u0448\u0438\u043d\u0430 \u0432\u0440\u0435\u043c\u0435\u043d\u0438, \u043e\u043d \u043b\u0438\u0448\u044c \u0437\u0430\u043c\u0435\u0434\u043b\u044f\u0435\u0442 \u043d\u0435\u0438\u0437\u0431\u0435\u0436\u043d\u043e\u0435."',
+      pullQuoteAttr: 'FreezeWise \u041d\u0430\u0443\u043a\u0430 \u043e \u0435\u0434\u0435'
+    },
+    categories: { all: 'Все', vegetables: 'Овощи', protein: 'Белок', dairy: 'Молочка', fruits: 'Фрукты', grains: 'Крупы', seafood: 'Морепрод.', herbs: 'Травы', baked: 'Выпечка', other: 'Другое' },
+    product: {
+      freezer: 'Морозилка', fridge: 'Холод.', pantry: 'Полка',
+      months: 'мес', days: 'дн', weeks: 'нед', hours: 'ч', na: '\u2014',
+      addToFridge: '+ Холод.',
+      daysLeft: 'дн',
+      expired: 'Просрочен'
+    },
+    fridge: {
+      title: 'Мой холодильник',
+      total: 'Всего',
+      expiring: 'Истекает',
+      expired: 'Просрочено',
+      emptyTitle: 'Холодильник пуст',
+      emptyDesc: 'Найдите продукты и добавьте их для отслеживания свежести.',
+      location: { fridge: 'Холодильник', freezer: 'Морозилка', pantry: 'Полка' },
+      qty: 'Кол'
+    },
+    recipes: {
+      title: 'Рецепты',
+      generate: 'Рецепты из истекающих продуктов',
+      loading: 'AI готовит рецепты...',
+      emptyTitle: 'Пока нет рецептов',
+      emptyDesc: 'Сначала добавьте продукты в холодильник, затем сгенерируйте рецепты.',
+      time: 'мин',
+      ingredients: 'Ингредиенты',
+      steps: 'Шаги',
+      usesExpiring: 'Из истекающих'
+    },
+    settings: {
+      title: 'Настройки',
+      language: 'Язык',
+      theme: 'Тема',
+      currentTheme: 'Текущая тема',
+      themeAuto: 'Авто',
+      themeGreen: 'Зелёная',
+      themeWarm: 'Тёплая',
+      themeFruity: 'Фруктовая',
+      themeNeutral: 'Нейтральная',
+      aboutText: 'FreezeWise — AI-гид по хранению продуктов, который помогает сократить пищевые отходы. Ищите любой продукт, отслеживайте содержимое холодильника и получайте рецепты из истекающих ингредиентов.'
+    },
+    detail: {
+      freezer: 'Морозилка', fridge: 'Холод.', pantry: 'Полка',
+      freezeHow: 'Как заморозить', thawHow: 'Как разморозить',
+      spoilage: 'Признаки порчи', tips: 'Советы по хранению',
+      addToFridge: 'Добавить в холодильник',
+      locFridge: 'Холод.', locFreezer: 'Морозилка', locPantry: 'Полка',
+      addBtn: 'Добавить',
+      canFreeze: 'Можно замораживать', cannotFreeze: 'Нельзя замораживать'
+    },
+    scan: {
+      title: 'Фото-сканер',
+      subtitle: 'Распознавание продуктов через AI',
+      captureText: 'Нажмите для фото или загрузки',
+      analyzeBtn: 'Анализировать фото',
+      analyzing: 'Анализ фото...',
+      found: 'Найдено продуктов',
+      resultsTitle: 'Обнаруженные продукты',
+      addAll: 'Добавить выбранные',
+      comingSoonTitle: 'Скоро',
+      comingSoonDesc: 'Сканирование фото будет доступно в следующем обновлении.'
+    },
+    themes: {
+      green: 'Зелёный сад',
+      warm: 'Тёплая кухня',
+      colorful: 'Фруктовая свежесть',
+      neutral: 'Нейтральная чистота',
+      auto: 'Авто'
+    },
+    toast: {
+      added: 'Добавлено в холодильник',
+      removed: 'Удалено из холодильника',
+      error: 'Что-то пошло не так'
+    }
+  },
+  cn: {
+    nav: { search: '搜索', fridge: '冰箱', recipes: '食谱', settings: '设置' },
+    masthead: {
+      tagline: 'AI 食品储存指南',
+      taglineGreen: '绿色花园版',
+      taglineWarm: '温暖厨房版',
+      taglineColorful: '水果新鲜版',
+      taglineNeutral: 'AI 食品储存指南',
+      issue: '数字版'
+    },
+    search: {
+      placeholder: '搜索任何食物...',
+      btn: 'AI 搜索',
+      resultLabel: '结果',
+      emptyTitle: '没有结果',
+      emptyDesc: '尝试搜索食品，例如"鸡肉"或"西兰花"',
+      errorTitle: '连接错误',
+      errorDesc: '无法连接服务器。请检查网络连接后重试。',
+      pullQuote: '"冰箱不是时间机器——它只是减缓了不可避免的过程。"',
+      pullQuoteAttr: 'FreezeWise 食品科学'
+    },
+    categories: { all: '全部', vegetables: '蔬菜', protein: '蛋白质', dairy: '乳制品', fruits: '水果', grains: '谷物', seafood: '海鲜', herbs: '香草', baked: '烘焙', other: '其他' },
+    product: {
+      freezer: '冷冻', fridge: '冷藏', pantry: '常温',
+      months: '月', days: '天', weeks: '周', hours: '时', na: '—',
+      addToFridge: '+ 冰箱',
+      daysLeft: '天',
+      expired: '已过期'
+    },
+    fridge: {
+      title: '我的冰箱',
+      total: '总计',
+      expiring: '即将过期',
+      expired: '已过期',
+      emptyTitle: '冰箱是空的',
+      emptyDesc: '搜索食品并添加到冰箱以跟踪新鲜度。',
+      location: { fridge: '冷藏', freezer: '冷冻', pantry: '常温' },
+      qty: '数量'
+    },
+    recipes: {
+      title: '食谱',
+      generate: '从即将过期食品生成食谱',
+      loading: 'AI 正在生成食谱...',
+      emptyTitle: '暂无食谱',
+      emptyDesc: '先添加食品到冰箱，然后从即将过期的食材生成食谱。',
+      time: '分钟',
+      ingredients: '食材',
+      steps: '步骤',
+      usesExpiring: '使用即将过期'
+    },
+    settings: {
+      title: '设置',
+      language: '语言',
+      theme: '主题',
+      currentTheme: '当前主题',
+      themeAuto: '自动',
+      themeGreen: '绿色',
+      themeWarm: '温暖',
+      themeFruity: '水果',
+      themeNeutral: '中性',
+      aboutText: 'FreezeWise 是一款AI驱动的食品储存指南，帮助您减少食物浪费。搜索任何食品了解最佳储存方法，跟踪冰箱内容，并在食材过期前获取食谱。'
+    },
+    detail: {
+      freezer: '冷冻', fridge: '冷藏', pantry: '常温',
+      freezeHow: '如何冷冻', thawHow: '如何解冻',
+      spoilage: '变质迹象', tips: '储存建议',
+      addToFridge: '添加到冰箱',
+      locFridge: '冷藏', locFreezer: '冷冻', locPantry: '常温',
+      addBtn: '添加到冰箱',
+      canFreeze: '可冷冻', cannotFreeze: '不可冷冻'
+    },
+    scan: {
+      title: '拍照扫描',
+      subtitle: '用AI识别食品',
+      captureText: '点击拍照或上传',
+      analyzeBtn: '分析照片',
+      analyzing: '正在分析照片...',
+      found: '发现食品',
+      resultsTitle: '检测到的食品',
+      addAll: '添加选中到冰箱',
+      comingSoonTitle: '即将推出',
+      comingSoonDesc: '拍照扫描功能将在后续更新中提供。'
+    },
+    themes: {
+      green: '绿色花园',
+      warm: '温暖厨房',
+      colorful: '水果新鲜',
+      neutral: '中性简洁',
+      auto: '自动'
+    },
+    toast: {
+      added: '已添加到冰箱',
+      removed: '已从冰箱移除',
+      error: '出了点问题'
+    }
+  }
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const State = {
+  locale: localStorage.getItem('fw_locale') || 'en',
+  themeOverride: localStorage.getItem('fw_theme') || 'auto',
+  currentTheme: 'neutral',
+  currentScreen: 'search',
+  products: [],
+  categories: [],
+  selectedCategory: 'all',
+  fridgeItems: [],
+  fridgeStats: null,
+  recipes: [],
+  searchQuery: '',
+  detailProduct: null,
+  detailLocation: 'fridge',
+  scanFile: null,
+  scanResults: [],
+  isSearching: false,
+  isFridgeLoading: false,
+  isRecipeLoading: false
+};
+
+/* ============================================================
+   i18n ENGINE
+   ============================================================ */
+function t(key) {
+  const parts = key.split('.');
+  let obj = I18N[State.locale];
+  for (const p of parts) {
+    if (!obj || typeof obj !== 'object') return key;
+    obj = obj[p];
+  }
+  return obj || key;
+}
+
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (el.tagName === 'INPUT') {
+      el.placeholder = val;
+    } else {
+      el.textContent = val;
+    }
+  });
+  // Search placeholder
+  const si = document.getElementById('searchInput');
+  if (si) si.placeholder = t('search.placeholder');
+  // Masthead
+  updateMasthead();
+}
+
+function updateMasthead() {
+  const d = new Date();
+  const months = {
+    en: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    ru: ['Января','Февраля','Марта','Апреля','Мая','Июня','Июля','Августа','Сентября','Октября','Ноября','Декабря'],
+    cn: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+  };
+  const ml = months[State.locale] || months.en;
+  const dateStr = State.locale === 'cn'
+    ? `${d.getFullYear()}年${ml[d.getMonth()]}${d.getDate()}日`
+    : `${ml[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  document.getElementById('mastheadDate').textContent = dateStr;
+  document.getElementById('mastheadIssue').textContent = t('masthead.issue');
+  // Tagline based on theme
+  const themeTaglines = {
+    green: 'masthead.taglineGreen',
+    warm: 'masthead.taglineWarm',
+    colorful: 'masthead.taglineColorful',
+    neutral: 'masthead.taglineNeutral'
+  };
+  document.getElementById('mastheadTagline').textContent = t(themeTaglines[State.currentTheme] || 'masthead.tagline');
+}
+
+/* ============================================================
+   THEME ENGINE
+   ============================================================ */
+function applyTheme(themeName) {
+  State.currentTheme = themeName;
+  document.body.setAttribute('data-theme', themeName);
+  // Update settings display
+  const el = document.getElementById('settingsCurrentTheme');
+  if (el) el.textContent = t('themes.' + themeName);
+  // Update theme selector active states
+  document.querySelectorAll('#themeSelector .theme-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === State.themeOverride);
+  });
+  updateMasthead();
+}
+
+function resolveTheme(serverTheme) {
+  if (State.themeOverride !== 'auto') {
+    applyTheme(State.themeOverride);
+  } else {
+    applyTheme(serverTheme || 'neutral');
+  }
+}
+
+/* ============================================================
+   API CLIENT
+   ============================================================ */
+const API = {
+  base: '',
+
+  async get(path) {
+    const res = await fetch(this.base + path);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  },
+
+  async post(path, body) {
+    const res = await fetch(this.base + path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  },
+
+  async del(path) {
+    const res = await fetch(this.base + path, { method: 'DELETE' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  },
+
+  async patch(path, body) {
+    const res = await fetch(this.base + path, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  },
+
+  async postForm(path, formData) {
+    const res = await fetch(this.base + path, {
+      method: 'POST',
+      body: formData
+    });
+    return res;
+  }
+};
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+let toastTimer = null;
+function showToast(msg, type = 'error') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast' + (type === 'success' ? ' success' : '');
+  clearTimeout(toastTimer);
+  requestAnimationFrame(() => {
+    el.classList.add('visible');
+    toastTimer = setTimeout(() => el.classList.remove('visible'), 2500);
+  });
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function navigateTo(screen) {
+  State.currentScreen = screen;
+  // Screens
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const target = document.getElementById('screen' + screen.charAt(0).toUpperCase() + screen.slice(1));
+  if (target) {
+    target.style.display = 'block';
+    requestAnimationFrame(() => target.classList.add('active'));
+  }
+  // Nav
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.screen === screen);
+  });
+  // FAB visibility
+  const fab = document.getElementById('cameraFab');
+  fab.classList.toggle('hidden', screen !== 'search');
+  // Pull quote visibility
+  const pq = document.getElementById('pullQuote');
+  if (pq) pq.style.display = screen === 'search' ? '' : 'none';
+  // Load data for screen
+  if (screen === 'fridge') loadFridge();
+  if (screen === 'recipes') { /* just show current state */ }
+  if (screen === 'search' && State.products.length === 0 && !State.searchQuery) loadProducts();
+}
+
+/* ============================================================
+   SEARCH SCREEN
+   ============================================================ */
+let searchDebounce = null;
+
+function initSearch() {
+  const input = document.getElementById('searchInput');
+  const btn = document.getElementById('searchBtn');
+
+  input.addEventListener('input', () => {
+    clearTimeout(searchDebounce);
+    searchDebounce = setTimeout(() => {
+      State.searchQuery = input.value.trim();
+      if (State.searchQuery.length > 0) {
+        searchProducts(State.searchQuery);
+      } else {
+        loadProducts();
+      }
+    }, 300);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      clearTimeout(searchDebounce);
+      State.searchQuery = input.value.trim();
+      if (State.searchQuery) searchProducts(State.searchQuery);
+    }
+  });
+
+  btn.addEventListener('click', () => {
+    State.searchQuery = input.value.trim();
+    if (State.searchQuery) searchProducts(State.searchQuery);
+  });
+}
+
+async function loadProducts() {
+  showSearchLoading(true);
+  hideSearchStates();
+  try {
+    const data = await API.get('/api/products');
+    State.products = Array.isArray(data) ? data : (data.products || []);
+    filterAndRender();
+  } catch (e) {
+    showSearchError();
+  } finally {
+    showSearchLoading(false);
+  }
+}
+
+async function searchProducts(query) {
+  showSearchLoading(true);
+  hideSearchStates();
+  try {
+    const data = await API.get('/api/products/search?q=' + encodeURIComponent(query));
+    State.products = data.products || [];
+    State.selectedCategory = 'all';
+    updateCategoryTabs();
+    renderProducts(State.products);
+    if (State.products.length === 0) showSearchEmpty();
+  } catch (e) {
+    showSearchError();
+  } finally {
+    showSearchLoading(false);
+  }
+}
+
+async function loadCategories() {
+  try {
+    const data = await API.get('/api/categories');
+    State.categories = Array.isArray(data) ? data : (data.categories || []);
+  } catch (e) {
+    State.categories = [];
+  }
+  renderCategoryTabs();
+}
+
+function renderCategoryTabs() {
+  const container = document.getElementById('categoriesScroll');
+  const cats = ['all', ...State.categories.map(c => typeof c === 'string' ? c.toLowerCase() : (c.name || '').toLowerCase())];
+  const uniqueCats = [...new Set(cats)];
+  // Fallback if API returns nothing
+  const defaultCats = ['all', 'vegetables', 'protein', 'dairy', 'fruits', 'grains', 'seafood'];
+  const finalCats = uniqueCats.length > 1 ? uniqueCats : defaultCats;
+
+  container.innerHTML = finalCats.map(cat => {
+    const label = t('categories.' + cat) || cat;
+    const isActive = cat === State.selectedCategory;
+    return `<button class="cat-tab${isActive ? ' active' : ''}" data-cat="${cat}">${label}</button>`;
+  }).join('');
+
+  container.querySelectorAll('.cat-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      State.selectedCategory = tab.dataset.cat;
+      updateCategoryTabs();
+      filterAndRender();
+    });
+  });
+}
+
+function updateCategoryTabs() {
+  document.querySelectorAll('.cat-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.cat === State.selectedCategory);
+  });
+}
+
+function filterAndRender() {
+  let items = State.products;
+  if (State.selectedCategory !== 'all') {
+    items = items.filter(p => (p.category || '').toLowerCase() === State.selectedCategory);
+  }
+  renderProducts(items);
+  if (items.length === 0 && State.products.length > 0) {
+    showSearchEmpty();
+  }
+}
+
+function getProductDisplayName(product) {
+  if (State.locale === 'ru' && product.name_ru) return product.name_ru;
+  if (State.locale === 'cn' && product.name_cn) return product.name_cn;
+  return product.name || 'Unknown';
+}
+
+function formatStorage(value, unit) {
+  if (!value && value !== 0) return t('product.na');
+  return value + ' ' + t('product.' + (unit || 'days'));
+}
+
+function formatFreezeMonths(months) {
+  if (!months && months !== 0) return t('product.na');
+  return months + ' ' + t('product.months');
+}
+
+function formatFridgeDays(days) {
+  if (!days && days !== 0) return t('product.na');
+  return days + ' ' + t('product.days');
+}
+
+function formatPantryDays(days) {
+  if (!days && days !== 0) return t('product.na');
+  if (days < 1) return '<1 ' + t('product.days');
+  return days + ' ' + t('product.days');
+}
+
+function renderProducts(products) {
+  const container = document.getElementById('productsList');
+  hideSearchStates();
+
+  if (products.length === 0) {
+    container.innerHTML = '';
+    document.getElementById('searchResultCount').textContent = '';
+    document.getElementById('searchResultLabel').textContent = '';
+    return;
+  }
+
+  document.getElementById('searchResultLabel').textContent = t('search.resultLabel');
+  document.getElementById('searchResultCount').textContent = products.length + (products.length === 1 ? ' item' : ' items');
+
+  container.innerHTML = products.map((p, i) => {
+    const num = String(i + 1).padStart(2, '0');
+    const name = getProductDisplayName(p);
+    const icon = p.icon || '🍽️';
+    const tip = (p.tips && p.tips.length > 0) ? p.tips[0] : '';
+    const freezeVal = formatFreezeMonths(p.freeze_months);
+    const fridgeVal = formatFridgeDays(p.fridge_days);
+    const pantryVal = formatPantryDays(p.pantry_days);
+    const badge = p.can_freeze
+      ? `<span class="card-badge ok">${t('detail.canFreeze')}</span>`
+      : `<span class="card-badge expired">${t('detail.cannotFreeze')}</span>`;
+
+    return `
+      <article class="product-card fade-in" data-product-id="${p.id}" style="animation-delay:${i * 0.04}s">
+        <div class="card-row-1">
+          <div class="card-left">
+            <span class="product-num">${num}</span>
+            <span class="product-emoji">${icon}</span>
+            <span class="product-name">${escHtml(name)}</span>
+          </div>
+          ${badge}
+        </div>
+        <div class="card-row-2">
+          <div class="storage-item">
+            <span class="storage-label">${t('product.freezer')}</span>
+            <span class="storage-value">${freezeVal}</span>
+          </div>
+          <div class="storage-item">
+            <span class="storage-label">${t('product.fridge')}</span>
+            <span class="storage-value">${fridgeVal}</span>
+          </div>
+          <div class="storage-item">
+            <span class="storage-label">${t('product.pantry')}</span>
+            <span class="storage-value">${pantryVal}</span>
+          </div>
+        </div>
+        ${tip ? `<p class="product-tip">"${escHtml(tip)}"</p>` : ''}
+        <button class="add-to-fridge-btn" data-product-id="${p.id}" onclick="event.stopPropagation(); window.FW.quickAdd('${p.id}')">${t('product.addToFridge')}</button>
+      </article>`;
+  }).join('');
+
+  // Click handlers for product detail
+  container.querySelectorAll('.product-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.add-to-fridge-btn')) return;
+      const pid = card.dataset.productId;
+      openProductDetail(pid);
+    });
+  });
+}
+
+function showSearchLoading(show) {
+  document.getElementById('searchSkeletons').style.display = show ? 'block' : 'none';
+  if (show) {
+    document.getElementById('productsList').innerHTML = '';
+    hideSearchStates();
+  }
+}
+
+function showSearchEmpty() {
+  document.getElementById('searchEmpty').style.display = 'block';
+}
+
+function showSearchError() {
+  document.getElementById('searchError').style.display = 'block';
+}
+
+function hideSearchStates() {
+  document.getElementById('searchEmpty').style.display = 'none';
+  document.getElementById('searchError').style.display = 'none';
+}
+
+/* ============================================================
+   PRODUCT DETAIL MODAL
+   ============================================================ */
+async function openProductDetail(productId) {
+  try {
+    const product = await API.get('/api/products/' + productId);
+    State.detailProduct = product;
+    State.detailLocation = 'fridge';
+    renderDetailModal(product);
+    openModal('detail');
+  } catch (e) {
+    showToast(t('toast.error'));
+  }
+}
+
+function renderDetailModal(p) {
+  document.getElementById('detailEmoji').textContent = p.icon || '🍽️';
+  document.getElementById('detailName').textContent = getProductDisplayName(p);
+
+  // i18n names
+  const names = [];
+  if (p.name && State.locale !== 'en') names.push('EN: ' + p.name);
+  if (p.name_ru && State.locale !== 'ru') names.push('RU: ' + p.name_ru);
+  if (p.name_cn && State.locale !== 'cn') names.push('CN: ' + p.name_cn);
+  document.getElementById('detailNamesI18n').textContent = names.join(' \u00b7 ');
+
+  document.getElementById('detailCategory').textContent = (p.category || '').toUpperCase();
+
+  const fb = document.getElementById('detailFreezeBadge');
+  fb.textContent = p.can_freeze ? t('detail.canFreeze') : t('detail.cannotFreeze');
+  fb.className = 'detail-freeze-badge ' + (p.can_freeze ? 'yes' : 'no');
+
+  document.getElementById('detailFreezer').textContent = formatFreezeMonths(p.freeze_months);
+  document.getElementById('detailFridge').textContent = formatFridgeDays(p.fridge_days);
+  document.getElementById('detailPantry').textContent = formatPantryDays(p.pantry_days);
+
+  // Freeze how
+  const fhSection = document.getElementById('detailFreezeHow');
+  if (p.freeze_how) {
+    fhSection.style.display = '';
+    document.getElementById('detailFreezeHowText').textContent = p.freeze_how;
+  } else {
+    fhSection.style.display = 'none';
+  }
+
+  // Thaw how
+  const thSection = document.getElementById('detailThawHow');
+  if (p.thaw_how) {
+    thSection.style.display = '';
+    document.getElementById('detailThawHowText').textContent = p.thaw_how;
+  } else {
+    thSection.style.display = 'none';
+  }
+
+  // Spoilage
+  const spSection = document.getElementById('detailSpoilage');
+  const spList = document.getElementById('detailSpoilageList');
+  if (p.spoilage_signs && p.spoilage_signs.length > 0) {
+    spSection.style.display = '';
+    const signs = Array.isArray(p.spoilage_signs) ? p.spoilage_signs : [p.spoilage_signs];
+    spList.innerHTML = signs.map(s => `<li>${escHtml(s)}</li>`).join('');
+  } else {
+    spSection.style.display = 'none';
+  }
+
+  // Tips
+  const tipsSection = document.getElementById('detailTips');
+  const tipsList = document.getElementById('detailTipsList');
+  if (p.tips && p.tips.length > 0) {
+    tipsSection.style.display = '';
+    tipsList.innerHTML = p.tips.map(tip => `<div class="detail-tip">"${escHtml(tip)}"</div>`).join('');
+  } else {
+    tipsSection.style.display = 'none';
+  }
+
+  // Location selector
+  document.querySelectorAll('.detail-loc-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.loc === State.detailLocation);
+    btn.onclick = () => {
+      State.detailLocation = btn.dataset.loc;
+      document.querySelectorAll('.detail-loc-btn').forEach(b => b.classList.toggle('active', b.dataset.loc === State.detailLocation));
+    };
+  });
+
+  // Add button
+  document.getElementById('detailAddBtn').onclick = () => addToFridgeFromDetail();
+}
+
+async function addToFridgeFromDetail() {
+  if (!State.detailProduct) return;
+  try {
+    await API.post('/api/fridge', {
+      product_id: State.detailProduct.id,
+      location: State.detailLocation,
+      quantity: 1
+    });
+    showToast(t('toast.added'), 'success');
+    closeModal('detail');
+    updateFridgeBadge();
+  } catch (e) {
+    showToast(t('toast.error'));
+  }
+}
+
+/* ============================================================
+   QUICK ADD (from search results)
+   ============================================================ */
+window.FW = {
+  async quickAdd(productId) {
+    try {
+      await API.post('/api/fridge', {
+        product_id: productId,
+        location: 'fridge',
+        quantity: 1
+      });
+      showToast(t('toast.added'), 'success');
+      updateFridgeBadge();
+    } catch (e) {
+      showToast(t('toast.error'));
+    }
+  }
+};
+
+/* ============================================================
+   MODAL OPEN/CLOSE
+   ============================================================ */
+function openModal(name) {
+  const overlay = document.getElementById(name + 'Overlay');
+  const sheet = document.getElementById(name + 'Sheet');
+  overlay.style.display = 'block';
+  requestAnimationFrame(() => {
+    overlay.classList.add('visible');
+    sheet.classList.add('visible');
+  });
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(name) {
+  const overlay = document.getElementById(name + 'Overlay');
+  const sheet = document.getElementById(name + 'Sheet');
+  sheet.classList.remove('visible');
+  overlay.classList.remove('visible');
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }, 350);
+}
+
+function initModals() {
+  // Detail modal
+  document.getElementById('detailOverlay').addEventListener('click', () => closeModal('detail'));
+  document.getElementById('detailClose').addEventListener('click', () => closeModal('detail'));
+  // Scan modal
+  document.getElementById('scanOverlay').addEventListener('click', () => closeModal('scan'));
+  document.getElementById('scanClose').addEventListener('click', () => closeModal('scan'));
+}
+
+/* ============================================================
+   FRIDGE SCREEN
+   ============================================================ */
+async function loadFridge() {
+  State.isFridgeLoading = true;
+  document.getElementById('fridgeSkeletons').style.display = 'block';
+  document.getElementById('fridgeItemsList').innerHTML = '';
+  document.getElementById('fridgeEmpty').style.display = 'none';
+
+  try {
+    const [items, stats] = await Promise.all([
+      API.get('/api/fridge'),
+      API.get('/api/fridge/stats')
+    ]);
+    State.fridgeItems = Array.isArray(items) ? items : (items.items || []);
+    State.fridgeStats = stats;
+    renderFridgeStats(stats);
+    renderFridgeItems(State.fridgeItems);
+    resolveTheme(stats.theme);
+    updateFridgeBadge();
+  } catch (e) {
+    showToast(t('toast.error'));
+  } finally {
+    State.isFridgeLoading = false;
+    document.getElementById('fridgeSkeletons').style.display = 'none';
+  }
+}
+
+function renderFridgeStats(stats) {
+  document.getElementById('statTotal').textContent = stats.total_items || 0;
+  document.getElementById('statExpiring').textContent = stats.expiring_soon || 0;
+  document.getElementById('statExpired').textContent = stats.expired || 0;
+  // Theme name
+  const themeName = t('themes.' + (stats.theme || 'neutral'));
+  document.getElementById('fridgeThemeName').textContent = themeName;
+}
+
+function renderFridgeItems(items) {
+  const container = document.getElementById('fridgeItemsList');
+
+  if (items.length === 0) {
+    container.innerHTML = '';
+    document.getElementById('fridgeEmpty').style.display = 'block';
+    return;
+  }
+  document.getElementById('fridgeEmpty').style.display = 'none';
+
+  // Sort: expired first, then expiring, then fresh
+  const sorted = [...items].sort((a, b) => {
+    const order = { expired: 0, expiring_soon: 1, fresh: 2 };
+    return (order[a.status] || 2) - (order[b.status] || 2);
+  });
+
+  container.innerHTML = sorted.map((item, i) => {
+    const icon = item.product_icon || '🍽️';
+    const name = item.product_name || 'Item';
+    const daysLeft = item.days_left;
+    const status = item.status || 'fresh';
+    const statusClass = status === 'expired' ? 'expired' : (status === 'expiring_soon' ? 'expiring' : 'fresh');
+    const daysText = status === 'expired' ? t('product.expired') : (daysLeft + ' ' + t('product.daysLeft'));
+    const loc = item.location || 'fridge';
+    const locLabel = t('fridge.location.' + loc);
+
+    return `
+      <div class="fridge-item fade-in" data-fridge-id="${item.id}" style="animation-delay:${i * 0.04}s">
+        <span class="fridge-item-icon">${icon}</span>
+        <div class="fridge-item-info">
+          <div class="fridge-item-name">${escHtml(name)}</div>
+          <div class="fridge-item-meta">
+            <span class="fridge-item-location">${escHtml(locLabel)}</span>
+            <span>${t('fridge.qty')}: ${item.quantity || 1}</span>
+          </div>
+        </div>
+        <div class="fridge-item-right">
+          <div class="fridge-days-left ${statusClass}">${daysText}</div>
+          <button class="fridge-remove-btn" data-fridge-id="${item.id}" title="Remove">&times;</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Remove handlers
+  container.querySelectorAll('.fridge-remove-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const fid = btn.dataset.fridgeId;
+      try {
+        await API.del('/api/fridge/' + fid);
+        showToast(t('toast.removed'), 'success');
+        loadFridge();
+      } catch (err) {
+        showToast(t('toast.error'));
+      }
+    });
+  });
+}
+
+async function updateFridgeBadge() {
+  try {
+    const stats = await API.get('/api/fridge/stats');
+    const badge = document.getElementById('fridgeBadge');
+    const count = (stats.expiring_soon || 0) + (stats.expired || 0);
+    badge.textContent = count > 0 ? count : '';
+    // Also update theme
+    resolveTheme(stats.theme);
+  } catch (e) {
+    // Silent fail
+  }
+}
+
+/* ============================================================
+   RECIPES SCREEN
+   ============================================================ */
+function initRecipes() {
+  document.getElementById('generateRecipesBtn').addEventListener('click', generateRecipes);
+}
+
+async function generateRecipes() {
+  const btn = document.getElementById('generateRecipesBtn');
+  btn.disabled = true;
+  document.getElementById('recipesLoading').style.display = 'block';
+  document.getElementById('recipesEmpty').style.display = 'none';
+  document.getElementById('recipesList').innerHTML = '';
+
+  try {
+    // Get expiring items
+    let expiringItems = [];
+    try {
+      expiringItems = await API.get('/api/fridge/expiring?days=5');
+      if (!Array.isArray(expiringItems)) expiringItems = expiringItems.items || [];
+    } catch (e) {
+      // Fallback: get all fridge items
+      const allItems = await API.get('/api/fridge');
+      expiringItems = Array.isArray(allItems) ? allItems : (allItems.items || []);
+    }
+
+    if (expiringItems.length === 0) {
+      document.getElementById('recipesLoading').style.display = 'none';
+      document.getElementById('recipesEmpty').style.display = 'block';
+      btn.disabled = false;
+      return;
+    }
+
+    const productIds = expiringItems.map(item => item.product_id).filter(Boolean);
+    const data = await API.post('/api/fridge/recipes', {
+      product_ids: productIds,
+      locale: State.locale
+    });
+
+    State.recipes = data.recipes || [];
+    renderRecipes(State.recipes);
+  } catch (e) {
+    showToast(t('toast.error'));
+    document.getElementById('recipesEmpty').style.display = 'block';
+  } finally {
+    document.getElementById('recipesLoading').style.display = 'none';
+    btn.disabled = false;
+  }
+}
+
+function renderRecipes(recipes) {
+  const container = document.getElementById('recipesList');
+
+  if (recipes.length === 0) {
+    container.innerHTML = '';
+    document.getElementById('recipesEmpty').style.display = 'block';
+    return;
+  }
+
+  container.innerHTML = recipes.map((r, i) => {
+    const num = String(i + 1).padStart(2, '0');
+    const ingredients = (r.ingredients || []).map(ing => `<li>${escHtml(ing)}</li>`).join('');
+    const steps = (r.steps || []).map(step => `<li>${escHtml(step)}</li>`).join('');
+
+    return `
+      <article class="recipe-card fade-in" style="animation-delay:${i * 0.06}s">
+        <div class="recipe-num">${num}</div>
+        <div class="recipe-title">${escHtml(r.title || 'Recipe')}</div>
+        <div class="recipe-meta">
+          <span class="recipe-meta-item">${r.time_minutes || '?'} ${t('recipes.time')}</span>
+        </div>
+        ${r.uses_expiring ? `<span class="recipe-uses-expiring">${t('recipes.usesExpiring')}</span>` : ''}
+        <div class="recipe-section-label">${t('recipes.ingredients')}</div>
+        <ul class="recipe-ingredients">${ingredients}</ul>
+        <div class="recipe-section-label">${t('recipes.steps')}</div>
+        <ol class="recipe-steps">${steps}</ol>
+      </article>`;
+  }).join('');
+}
+
+/* ============================================================
+   SETTINGS SCREEN
+   ============================================================ */
+function initSettings() {
+  // Language
+  document.querySelectorAll('#langSelector .lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      State.locale = btn.dataset.lang;
+      localStorage.setItem('fw_locale', State.locale);
+      updateLangButtons();
+      applyI18n();
+      renderCategoryTabs();
+      // Re-render current products
+      if (State.currentScreen === 'search') filterAndRender();
+      if (State.currentScreen === 'fridge') renderFridgeItems(State.fridgeItems);
+    });
+  });
+  updateLangButtons();
+
+  // Theme
+  document.querySelectorAll('#themeSelector .theme-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      State.themeOverride = btn.dataset.theme;
+      localStorage.setItem('fw_theme', State.themeOverride);
+      if (State.themeOverride === 'auto') {
+        resolveTheme(State.fridgeStats ? State.fridgeStats.theme : 'neutral');
+      } else {
+        applyTheme(State.themeOverride);
+      }
+      document.querySelectorAll('#themeSelector .theme-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.theme === State.themeOverride);
+      });
+    });
+  });
+  // Init active state
+  document.querySelectorAll('#themeSelector .theme-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.theme === State.themeOverride);
+  });
+}
+
+function updateLangButtons() {
+  document.querySelectorAll('#langSelector .lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === State.locale);
+  });
+}
+
+/* ============================================================
+   PHOTO SCAN
+   ============================================================ */
+function initScan() {
+  const fab = document.getElementById('cameraFab');
+  const captureArea = document.getElementById('scanCaptureArea');
+  const fileInput = document.getElementById('scanFileInput');
+  const analyzeBtn = document.getElementById('scanAnalyzeBtn');
+  const addAllBtn = document.getElementById('scanAddAllBtn');
+
+  fab.addEventListener('click', () => {
+    resetScanModal();
+    openModal('scan');
+  });
+
+  captureArea.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    State.scanFile = file;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      document.getElementById('scanPreview').src = ev.target.result;
+      captureArea.classList.add('has-image');
+      analyzeBtn.disabled = false;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  analyzeBtn.addEventListener('click', () => analyzeScanPhoto());
+  addAllBtn.addEventListener('click', () => addScannedItems());
+}
+
+function resetScanModal() {
+  State.scanFile = null;
+  State.scanResults = [];
+  const captureArea = document.getElementById('scanCaptureArea');
+  captureArea.classList.remove('has-image');
+  document.getElementById('scanPreview').src = '';
+  document.getElementById('scanAnalyzeBtn').disabled = true;
+  document.getElementById('scanProgress').classList.remove('active');
+  document.getElementById('scanResults').classList.remove('active');
+  document.getElementById('scanComingSoon').style.display = 'none';
+  document.getElementById('scanFileInput').value = '';
+  document.getElementById('scanItemsList').innerHTML = '';
+}
+
+async function analyzeScanPhoto() {
+  if (!State.scanFile) return;
+  const progress = document.getElementById('scanProgress');
+  const progressText = document.getElementById('scanProgressText');
+  const analyzeBtn = document.getElementById('scanAnalyzeBtn');
+
+  analyzeBtn.disabled = true;
+  progress.classList.add('active');
+  progressText.textContent = t('scan.analyzing');
+
+  const formData = new FormData();
+  formData.append('image', State.scanFile);
+
+  try {
+    const res = await API.postForm('/api/fridge/scan', formData);
+
+    if (res.status === 404 || res.status === 501) {
+      // Endpoint not available yet
+      progress.classList.remove('active');
+      document.getElementById('scanComingSoon').style.display = 'block';
+      return;
+    }
+
+    if (!res.ok) throw new Error('Scan failed');
+
+    // Try SSE parsing
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('text/event-stream')) {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.stage === 'analyzing') {
+                progressText.textContent = t('scan.analyzing');
+              } else if (data.stage === 'found') {
+                progressText.textContent = `${t('scan.found')}: ${data.count || 0}`;
+              } else if (data.stage === 'done' && data.items) {
+                State.scanResults = data.items;
+                progress.classList.remove('active');
+                renderScanResults(data.items);
+              }
+            } catch (pe) { /* skip parse errors */ }
+          }
+        }
+      }
+    } else {
+      // JSON response
+      const data = await res.json();
+      State.scanResults = data.items || [];
+      progress.classList.remove('active');
+      if (State.scanResults.length > 0) {
+        renderScanResults(State.scanResults);
+      } else {
+        document.getElementById('scanComingSoon').style.display = 'block';
+      }
+    }
+  } catch (e) {
+    progress.classList.remove('active');
+    // Show coming soon as graceful fallback
+    document.getElementById('scanComingSoon').style.display = 'block';
+  } finally {
+    analyzeBtn.disabled = false;
+  }
+}
+
+function renderScanResults(items) {
+  const container = document.getElementById('scanItemsList');
+  const results = document.getElementById('scanResults');
+  results.classList.add('active');
+
+  container.innerHTML = items.map((item, i) => {
+    const name = item.name || item.product_name || 'Unknown';
+    const icon = item.icon || item.product_icon || '🍽️';
+    return `
+      <div class="scan-item-row">
+        <input type="checkbox" class="scan-item-check" data-idx="${i}" checked>
+        <span class="scan-item-emoji">${icon}</span>
+        <span class="scan-item-name">${escHtml(name)}</span>
+      </div>`;
+  }).join('');
+}
+
+async function addScannedItems() {
+  const checks = document.querySelectorAll('.scan-item-check:checked');
+  const selectedIndices = Array.from(checks).map(c => parseInt(c.dataset.idx));
+
+  for (const idx of selectedIndices) {
+    const item = State.scanResults[idx];
+    if (!item) continue;
+    try {
+      await API.post('/api/fridge', {
+        product_id: item.product_id || item.id,
+        location: 'fridge',
+        quantity: 1
+      });
+    } catch (e) {
+      // Continue with others
+    }
+  }
+
+  showToast(t('toast.added'), 'success');
+  closeModal('scan');
+  updateFridgeBadge();
+}
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+function escHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+/* ============================================================
+   INITIALIZATION
+   ============================================================ */
+function init() {
+  // Apply locale & theme
+  applyI18n();
+  resolveTheme('neutral');
+
+  // Init modules
+  initSearch();
+  initModals();
+  initRecipes();
+  initSettings();
+  initScan();
+
+  // Bottom nav
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => navigateTo(item.dataset.screen));
+  });
+
+  // Load initial data
+  loadCategories();
+  loadProducts();
+  updateFridgeBadge();
+
+  // Set search screen as default
+  navigateTo('search');
+}
+
+// Start
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+</script>
+</body>
+</html>
