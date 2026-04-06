@@ -1,15 +1,20 @@
 "use client";
 
+import { useState, Suspense } from "react";
 import FridgeItem from "@/components/fridge-item";
+import ShareFridge from "@/components/share-fridge";
+import ImportShare from "@/components/import-share";
 import { useLocaleStore, useFridgeStore, getFridgeItemStatus } from "@/lib/store";
 import { createT } from "@/lib/i18n";
 import Link from "next/link";
 
-export default function FridgePage() {
+function FridgeContent() {
   const locale = useLocaleStore((s) => s.locale);
   const t = createT(locale);
   const items = useFridgeStore((s) => s.items);
   const getStats = useFridgeStore((s) => s.getStats);
+
+  const [showShare, setShowShare] = useState(false);
 
   const stats = getStats();
 
@@ -26,12 +31,28 @@ export default function FridgePage() {
   return (
     <div>
       {/* Header */}
-      <div className="mb-6">
-        <h2 className="font-serif text-2xl text-neutral-900">{t("fridge.title")}</h2>
-        <p className="mt-1 font-sans text-sm text-neutral-400">
-          {t("fridge.subtitle")}
-        </p>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h2 className="font-serif text-2xl text-neutral-900">{t("fridge.title")}</h2>
+          <p className="mt-1 font-sans text-sm text-neutral-400">
+            {t("fridge.subtitle")}
+          </p>
+        </div>
+        {items.length > 0 && (
+          <button
+            onClick={() => setShowShare(true)}
+            className="flex items-center gap-1.5 border border-neutral-200 px-3 py-1.5 font-sans text-[10px] uppercase tracking-[0.15em] text-neutral-600 transition-colors hover:border-neutral-400"
+          >
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8M16 6l-4-4-4 4M12 2v13" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {t("share.native_share")}
+          </button>
+        )}
       </div>
+
+      {/* Import from share URL */}
+      <ImportShare />
 
       {items.length === 0 ? (
         <div className="py-16 text-center">
@@ -93,20 +114,37 @@ export default function FridgePage() {
             </Section>
           )}
 
-          {/* Recipe CTA */}
+          {/* History + Recipe links */}
           {items.length > 0 && (
-            <div className="mt-8 border-t border-neutral-200 pt-6 text-center">
+            <div className="mt-8 flex flex-col items-center gap-3 border-t border-neutral-200 pt-6">
               <Link
                 href="/recipes"
-                className="inline-block border border-neutral-900 bg-neutral-900 px-8 py-3 font-sans text-xs uppercase tracking-[0.2em] text-white transition-colors hover:bg-neutral-800"
+                className="inline-block w-full max-w-xs border border-neutral-900 bg-neutral-900 px-8 py-3 text-center font-sans text-xs uppercase tracking-[0.2em] text-white transition-colors hover:bg-neutral-800"
               >
                 {t("fridge.get_recipes")}
+              </Link>
+              <Link
+                href="/history"
+                className="inline-block font-sans text-xs text-neutral-400 underline transition-colors hover:text-neutral-600"
+              >
+                {t("history.view")}
               </Link>
             </div>
           )}
         </>
       )}
+
+      {/* Share modal */}
+      <ShareFridge open={showShare} onClose={() => setShowShare(false)} />
     </div>
+  );
+}
+
+export default function FridgePage() {
+  return (
+    <Suspense>
+      <FridgeContent />
+    </Suspense>
   );
 }
 

@@ -198,7 +198,7 @@ function calcExpiresAt(location: string, product: ProductResponse, addedAt: stri
   return null;
 }
 
-function determineDaysLeft(item: LocalFridgeItem): number | null {
+export function determineDaysLeft(item: LocalFridgeItem): number | null {
   const expires = calcExpiresAt(item.location, item.product, item.addedAt);
   if (!expires) return null;
   return Math.floor((new Date(expires).getTime() - Date.now()) / 86400000);
@@ -306,6 +306,60 @@ export function getFridgeItemStatus(item: LocalFridgeItem) {
   return { daysLeft, status, expiresAt };
 }
 
+// ── History Store (localStorage) ──
+
+export interface HistoryEntry {
+  id: string;
+  productName: string;
+  productIcon: string;
+  action: "eaten" | "wasted" | "added";
+  date: string; // ISO
+  daysBeforeExpiry: number | null; // positive = eaten before expiry, negative = wasted after
+}
+
+interface HistoryState {
+  history: HistoryEntry[];
+  addEntry: (entry: Omit<HistoryEntry, "id" | "date">) => void;
+  clearHistory: () => void;
+}
+
+const HISTORY_KEY = "freezewise-history";
+
+function loadHistory(): HistoryEntry[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory(entries: HistoryEntry[]) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+}
+
+export const useHistoryStore = create<HistoryState>((set, get) => ({
+  history: [],
+
+  addEntry: (entry) => {
+    const newEntry: HistoryEntry = {
+      ...entry,
+      id: generateId(),
+      date: new Date().toISOString(),
+    };
+    const updated = [newEntry, ...get().history];
+    saveHistory(updated);
+    set({ history: updated });
+  },
+
+  clearHistory: () => {
+    saveHistory([]);
+    set({ history: [] });
+  },
+}));
+
 // ── Recipes Store ──
 
 interface RecipesState {
@@ -372,4 +426,8 @@ export function initializeStores() {
   const fridgeItems = loadFridge();
   useFridgeStore.setState({ items: fridgeItems });
   useThemeStore.getState().setTheme(determineTheme(fridgeItems));
+
+  // Load history from localStorage
+  const historyEntries = loadHistory();
+  useHistoryStore.setState({ history: historyEntries });
 }
