@@ -1,17 +1,19 @@
-"""pydantic-ai agents for FreezeWise — structured output, retries, type safety.
+"""pydantic-ai agents for FreezeWise — PromptedOutput for universal model support.
 
-Agents use tool_choice for structured output. Only models that support tools
-can be used with Agent.run(). For other models, services fall back to raw httpx.
+Uses PromptedOutput instead of default Tool mode — works with ALL models
+including free ones that don't support tool_choice (qwen, llama, gemma, etc.).
 """
 
 from __future__ import annotations
 
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.output import PromptedOutput
 from pydantic_ai.providers.openai import OpenAIProvider
 
 from freezewise.config import settings
 from freezewise.schemas.product import ProductAIInput
+from freezewise.schemas.recipe import RecipeListResult
 from freezewise.schemas.scan import VisionResult
 
 # Shared OpenRouter provider
@@ -24,11 +26,6 @@ provider = OpenAIProvider(
 def make_model(model_name: str | None = None) -> OpenAIChatModel:
     """Create OpenRouter model for pydantic-ai."""
     return OpenAIChatModel(model_name or settings.agent_model, provider=provider)
-
-
-def is_tool_capable(model_name: str) -> bool:
-    """Check if a model supports tool_choice (required for pydantic-ai Agent)."""
-    return model_name in settings.tool_capable_models
 
 
 # ── Product Generation Agent ──
@@ -44,13 +41,19 @@ product_agent = Agent(
         "Spoilage signs must be detailed enough to be useful. "
         "Icon must be a single emoji representing the food."
     ),
-    output_type=ProductAIInput,
+    output_type=PromptedOutput(ProductAIInput),
     retries=2,
 )
 
 
-# NOTE: Recipe Agent removed — OpenRouter can't handle nested list[Object] via tools.
-# Recipes use raw httpx in RecipeService instead.
+# ── Recipe Agent (now works with all models via PromptedOutput) ──
+
+recipe_agent = Agent(
+    model=make_model(),
+    system_prompt="You are a chef AI. Suggest simple, practical recipes using the given ingredients.",
+    output_type=PromptedOutput(RecipeListResult),
+    retries=2,
+)
 
 
 # ── Vision Agent ──
@@ -63,6 +66,6 @@ vision_agent = Agent(
         "Use generic English names. Merge duplicates and sum quantities. "
         "Only include food items, ignore non-food objects."
     ),
-    output_type=VisionResult,
+    output_type=PromptedOutput(VisionResult),
     retries=1,
 )

@@ -25,10 +25,10 @@ export default function SearchPage() {
 
   const [showBarcode, setShowBarcode] = useState(false);
 
-  // Load initial products
+  // Load initial products (re-fetch on locale change)
   useEffect(() => {
     let cancelled = false;
-    getProducts()
+    getProducts(locale)
       .then((data) => {
         if (!cancelled) setProducts(data);
       })
@@ -38,7 +38,7 @@ export default function SearchPage() {
     return () => {
       cancelled = true;
     };
-  }, [setProducts]);
+  }, [setProducts, locale]);
 
   const displayProducts = searchQuery ? searchResults : products;
   const filteredProducts = selectedCategory

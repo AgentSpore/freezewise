@@ -25,8 +25,11 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 // Products
-export async function getProducts(): Promise<ProductResponse[]> {
-  return request<ProductResponse[]>("/api/products");
+export async function getProducts(locale?: string): Promise<ProductResponse[]> {
+  const params = new URLSearchParams();
+  if (locale) params.set("locale", locale);
+  const qs = params.toString();
+  return request<ProductResponse[]>(`/api/products${qs ? "?" + qs : ""}`);
 }
 
 export async function searchProducts(query: string, model?: string | null, locale?: string): Promise<ProductSearchResponse> {
@@ -40,8 +43,11 @@ export async function getProduct(id: number): Promise<ProductResponse> {
   return request<ProductResponse>(`/api/products/${id}`);
 }
 
-export async function getCategories(): Promise<CategoryInfo[]> {
-  return request<CategoryInfo[]>("/api/categories");
+export async function getCategories(locale?: string): Promise<CategoryInfo[]> {
+  const params = new URLSearchParams();
+  if (locale) params.set("locale", locale);
+  const qs = params.toString();
+  return request<CategoryInfo[]>(`/api/categories${qs ? "?" + qs : ""}`);
 }
 
 // Models

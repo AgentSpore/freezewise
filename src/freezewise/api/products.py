@@ -21,9 +21,10 @@ async def products_list(
     service: ProductService = Depends(get_product_service),
     q: str | None = Query(None, description="Filter cached products (name in any language)"),
     category: str | None = Query(None, description="Filter by category"),
+    locale: str = Query("en", description="Content language (en/ru/cn)"),
 ) -> list[ProductResponse]:
-    """List cached products with optional filter. Does NOT trigger AI generation."""
-    return await service.list_all(q=q, category=category)
+    """List cached products for given locale. Does NOT trigger AI generation."""
+    return await service.list_all(q=q, category=category, locale=locale)
 
 
 @router.get("/products/search", response_model=ProductSearchResponse)
@@ -36,7 +37,15 @@ async def products_search(
 ) -> ProductSearchResponse:
     """Search for a product — checks cache first, generates via AI if not found."""
     await ai_search_limiter.check(request)
-    products = await service.search(q, model_name=model, locale=locale)
+
+    # Minimum length to prevent junk queries (CJK chars count as full words)
+    cleaned = q.strip()
+    has_cjk = any(ord(c) > 0x2E80 for c in cleaned)
+    min_len = 1 if has_cjk else 3
+    if len(cleaned) < min_len:
+        raise HTTPException(status_code=400, detail="Query too short")
+
+    products = await service.search(cleaned, model_name=model, locale=locale)
     source = "cache" if products and products[0].id > 0 else "ai"
     return ProductSearchResponse(products=products, source=source, query=q)
 
@@ -56,9 +65,22 @@ async def product_detail(
 @router.get("/categories", response_model=list[CategoryInfo])
 async def categories_list(
     service: ProductService = Depends(get_product_service),
+    locale: str = Query("en", description="Content language (en/ru/cn)"),
 ) -> list[CategoryInfo]:
-    """List all product categories with counts (from cache)."""
-    return await service.list_categories()
+    """List product categories with counts for given locale."""
+    return await service.list_categories(locale=locale)
+
+
+@router.delete("/products/{product_id}")
+async def delete_product(
+    product_id: int,
+    service: ProductService = Depends(get_product_service),
+) -> dict:
+    """Delete a cached product (for cleaning up junk/spam entries)."""
+    deleted = await service.delete(product_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {"deleted": product_id}
 
 
 @router.get("/models")

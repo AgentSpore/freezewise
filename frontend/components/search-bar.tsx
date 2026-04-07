@@ -23,7 +23,7 @@ export default function SearchBar() {
         setSearchResults([], "", "");
         setIsSearching(true);
         try {
-          const products = await getProducts();
+          const products = await getProducts(locale);
           setProducts(products);
         } catch {
           // silent — cached products might not be available

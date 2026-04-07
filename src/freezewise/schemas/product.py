@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import html
 
+from loguru import logger
 from pydantic import BaseModel, Field, field_validator
 
 from freezewise.schemas.constants import CATEGORY_ICONS, VALID_CATEGORIES
@@ -124,10 +125,18 @@ class ProductAIInput(BaseModel):
 
 
 def validate_product_data(data: dict) -> dict | None:
-    """Validate and normalize AI-generated product data via Pydantic model."""
-    from loguru import logger
+    """Validate and normalize AI-generated product data via Pydantic model.
+
+    Rejects non-food items (all storage times = 0) and obviously invalid content.
+    """
     try:
         validated = ProductAIInput.model_validate(data).with_default_icon()
+
+        # Reject if all storage times are 0 — not a real food product
+        if validated.fridge_days == 0 and validated.pantry_days == 0 and validated.freeze_months == 0:
+            logger.warning("Rejected '{}' — all storage times are 0 (not food)", validated.name)
+            return None
+
         return validated.model_dump()
     except Exception as exc:
         logger.warning("Product validation failed: {}", exc)

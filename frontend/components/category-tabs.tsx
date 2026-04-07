@@ -18,7 +18,7 @@ export default function CategoryTabs() {
   useEffect(() => {
     let cancelled = false;
     setIsLoadingCategories(true);
-    getCategories()
+    getCategories(locale)
       .then((cats) => {
         if (!cancelled) setCategories(cats);
       })
@@ -31,7 +31,7 @@ export default function CategoryTabs() {
     return () => {
       cancelled = true;
     };
-  }, [setCategories, setIsLoadingCategories]);
+  }, [setCategories, setIsLoadingCategories, locale]);
 
   if (categories.length === 0) return null;
 

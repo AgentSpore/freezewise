@@ -1,4 +1,4 @@
-"""Database initialization for FreezeWise — no seed data, AI generates on demand."""
+"""Database — singleton connection with async context manager for safe access."""
 
 from __future__ import annotations
 
@@ -28,43 +28,81 @@ CREATE TABLE IF NOT EXISTS products (
     tips TEXT NOT NULL DEFAULT '[]',
     icon TEXT NOT NULL DEFAULT '',
     source TEXT NOT NULL DEFAULT 'ai',
+    locale TEXT NOT NULL DEFAULT 'en',
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
 CREATE INDEX IF NOT EXISTS idx_products_name ON products(name COLLATE NOCASE);
 CREATE INDEX IF NOT EXISTS idx_products_name_ru ON products(name_ru COLLATE NOCASE);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_products_name_unique ON products(name COLLATE NOCASE);
+CREATE INDEX IF NOT EXISTS idx_products_locale ON products(locale);
 """;
+
+# Migration: drop old unique index, add locale column if missing, create new unique
+MIGRATIONS = [
+    "DROP INDEX IF EXISTS idx_products_name_unique",
+    "CREATE UNIQUE INDEX IF NOT EXISTS idx_products_name_locale_unique ON products(name COLLATE NOCASE, locale)",
+]
 
 
 def _dict_row_factory(cursor: aiosqlite.Cursor, row: tuple) -> dict:
-    """Convert row to dict using cursor description."""
     columns = [col[0] for col in cursor.description]
     return dict(zip(columns, row))
 
 
+# Singleton connection
+_db: aiosqlite.Connection | None = None
+
+
+async def _get_connection() -> aiosqlite.Connection:
+    """Get or create singleton database connection."""
+    global _db
+    if _db is None:
+        _db = await aiosqlite.connect(str(DB_PATH))
+        _db.row_factory = _dict_row_factory
+        await _db.create_function("ULOWER", 1, lambda s: s.lower() if s else s)
+    return _db
+
+
 @asynccontextmanager
 async def get_db() -> AsyncIterator[aiosqlite.Connection]:
-    """Async context manager for database connections.
+    """Async context manager for database access.
 
-    Usage:
-        async with get_db() as db:
-            cursor = await db.execute(...)
+    Uses singleton connection — no overhead per query.
     """
-    db = await aiosqlite.connect(str(DB_PATH))
-    db.row_factory = _dict_row_factory
-    await db.create_function("ULOWER", 1, lambda s: s.lower() if s else s)
-    try:
-        yield db
-    finally:
-        await db.close()
+    db = await _get_connection()
+    yield db
 
 
 async def init_db() -> None:
-    """Initialize database schema. No seed data — AI generates products on demand."""
-    async with get_db() as db:
-        await db.executescript(SCHEMA)
-        cursor = await db.execute("SELECT COUNT(*) as cnt FROM products")
-        row = await cursor.fetchone()
-        logger.info("Database ready — {} cached products", row["cnt"])
+    """Initialize database schema and run migrations."""
+    db = await _get_connection()
+    await db.executescript(SCHEMA)
+
+    # Add locale column to existing DBs (migration for legacy schemas)
+    cursor = await db.execute("PRAGMA table_info(products)")
+    cols = {row["name"] for row in await cursor.fetchall()}
+    if "locale" not in cols:
+        await db.execute("ALTER TABLE products ADD COLUMN locale TEXT NOT NULL DEFAULT 'en'")
+        logger.info("Migrated: added locale column")
+
+    # Run index migrations
+    for stmt in MIGRATIONS:
+        try:
+            await db.execute(stmt)
+        except Exception as exc:
+            logger.warning("Migration skipped ({}): {}", stmt[:50], exc)
+
+    await db.commit()
+
+    cursor = await db.execute("SELECT COUNT(*) as cnt FROM products")
+    row = await cursor.fetchone()
+    logger.info("Database ready — {} cached products", row["cnt"])
+
+
+async def close_db() -> None:
+    """Close database connection on shutdown."""
+    global _db
+    if _db:
+        await _db.close()
+        _db = None

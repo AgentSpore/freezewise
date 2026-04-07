@@ -123,8 +123,8 @@ async def _seed_test_products() -> None:
                 """INSERT OR IGNORE INTO products
                    (name, name_ru, name_cn, category, can_freeze, freeze_months,
                     freeze_how, thaw_how, fridge_days, pantry_days, spoilage_signs,
-                    tips, icon, source)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'test')""",
+                    tips, icon, source, locale)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'test', 'en')""",
                 (
                     product_data["name"],
                     product_data["name_ru"],
@@ -147,7 +147,8 @@ async def _seed_test_products() -> None:
 @pytest_asyncio.fixture
 async def client() -> AsyncIterator[AsyncClient]:
     """Async HTTP test client with fresh database and mocked AI."""
-    # Ensure clean DB
+    # Reset singleton connection and clean DB
+    await db_mod.close_db()
     if os.path.exists(_test_db):
         os.unlink(_test_db)
 
@@ -166,6 +167,11 @@ async def client() -> AsyncIterator[AsyncClient]:
         transport = ASGITransport(app=app)
         async with AsyncClient(transport=transport, base_url="http://test") as ac:
             yield ac
+
+    # Cleanup: close singleton connection
+    await db_mod.close_db()
+    if os.path.exists(_test_db):
+        os.unlink(_test_db)
 
     # Cleanup
     if os.path.exists(_test_db):

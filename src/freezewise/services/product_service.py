@@ -22,9 +22,9 @@ class ProductService:
         self.ai = ai
 
     async def search(self, query: str, model_name: str | None = None, locale: str = "en") -> list[ProductResponse]:
-        """Search products — checks DB cache first, generates via AI if not found."""
+        """Search products — checks DB cache first (per locale), generates via AI if not found."""
         rows = await self.ai.search_or_generate(query, model_name=model_name, locale=locale)
-        logger.debug("Search '{}' returned {} results", query, len(rows))
+        logger.debug("Search '{}' [{}] returned {} results", query, locale, len(rows))
         return [self.repo.to_response(r) for r in rows]
 
     async def get(self, product_id: int) -> ProductResponse | None:
@@ -38,14 +38,19 @@ class ProductService:
         self,
         q: str | None = None,
         category: str | None = None,
+        locale: str = "en",
     ) -> list[ProductResponse]:
-        """List cached products with full storage details."""
-        rows = await self.repo.get_all(q=q, category=category)
+        """List cached products with full storage details for given locale."""
+        rows = await self.repo.get_all(q=q, category=category, locale=locale)
         return [self.repo.to_response(r) for r in rows]
 
-    async def list_categories(self) -> list[CategoryInfo]:
-        """List all categories with product counts."""
-        rows = await self.repo.get_categories()
+    async def delete(self, product_id: int) -> bool:
+        """Delete a cached product."""
+        return await self.repo.delete(product_id)
+
+    async def list_categories(self, locale: str = "en") -> list[CategoryInfo]:
+        """List categories with product counts for given locale."""
+        rows = await self.repo.get_categories(locale=locale)
         return [
             CategoryInfo(
                 name=r["category"],
