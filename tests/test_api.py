@@ -5,6 +5,8 @@ from __future__ import annotations
 import pytest
 from httpx import AsyncClient
 
+import freezewise.database as db_mod
+
 
 # -- Health -------------------------------------------------------------------
 
@@ -185,3 +187,75 @@ async def test_product_detail_has_tips(client: AsyncClient) -> None:
     assert isinstance(p["tips"], list)
     assert len(p["tips"]) >= 1
     assert p["spoilage_signs"]
+
+
+# -- Cold-safe / spoilage fields ----------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_product_has_cold_fields(client: AsyncClient) -> None:
+    """Every product exposes the new cold-safe / rancid fields."""
+    resp = await client.get("/api/products/1")
+    p = resp.json()
+    assert p["cold_safe"] in ("yes", "no", "depends")
+    assert "cold_note" in p
+    assert "rancid_signs" in p
+
+
+# -- Curated seed: search works WITHOUT the AI --------------------------------
+
+
+@pytest.mark.asyncio
+async def test_seed_search_chicken(seeded_client: AsyncClient) -> None:
+    """A long-tail food resolves from the curated seed, not the AI."""
+    resp = await seeded_client.get("/api/products/search", params={"q": "chicken"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data["products"]) >= 1
+    assert data["source"] == "cache"
+    p = data["products"][0]
+    assert p["cold_safe"] in ("yes", "no", "depends")
+    assert p["spoilage_signs"]
+
+
+@pytest.mark.asyncio
+async def test_seed_search_walnuts_has_rancid(seeded_client: AsyncClient) -> None:
+    """Walnuts come from the seed and carry rancidity guidance for fats/nuts."""
+    resp = await seeded_client.get("/api/products/search", params={"q": "walnuts"})
+    assert resp.status_code == 200
+    data = resp.json()
+    assert len(data["products"]) >= 1
+    walnut = next((p for p in data["products"] if p["name"] == "Walnuts"), None)
+    assert walnut is not None
+    assert walnut["rancid_signs"]
+    assert walnut["cold_safe"] == "yes"
+
+
+@pytest.mark.asyncio
+async def test_seed_search_olive_oil(seeded_client: AsyncClient) -> None:
+    resp = await seeded_client.get("/api/products/search", params={"q": "olive oil"})
+    assert resp.status_code == 200
+    assert len(resp.json()["products"]) >= 1
+
+
+@pytest.mark.asyncio
+async def test_seed_search_russian(seeded_client: AsyncClient) -> None:
+    """Russian query against the curated seed (Молоко = Milk)."""
+    resp = await seeded_client.get("/api/products/search", params={"q": "Молоко"})
+    assert resp.status_code == 200
+    assert len(resp.json()["products"]) >= 1
+
+
+@pytest.mark.asyncio
+async def test_seed_is_idempotent(seeded_client: AsyncClient) -> None:
+    """Re-running the seed inserts nothing the second time."""
+    again = await db_mod.seed_products()
+    assert again == 0
+
+
+@pytest.mark.asyncio
+async def test_seed_populated_many_products(seeded_client: AsyncClient) -> None:
+    """The curated seed loads the full dataset (long tail of common foods)."""
+    resp = await seeded_client.get("/api/products")
+    assert resp.status_code == 200
+    assert len(resp.json()) >= 70

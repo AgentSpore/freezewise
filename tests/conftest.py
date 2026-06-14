@@ -15,6 +15,9 @@ from httpx import ASGITransport, AsyncClient
 # Set test DB path before importing app
 _test_db = tempfile.mkstemp(suffix=".db")[1]
 os.environ.setdefault("FREEZEWISE_DB", _test_db)
+# Skip the curated startup seed by default — most tests assert exact counts
+# against the small hand-seeded fixture set. Seed-specific tests opt back in.
+os.environ.setdefault("FREEZEWISE_SKIP_SEED", "1")
 
 import freezewise.database as db_mod  # noqa: E402
 from freezewise.main import app  # noqa: E402
@@ -142,6 +145,33 @@ async def _seed_test_products() -> None:
                 ),
             )
         await db.commit()
+
+
+@pytest_asyncio.fixture
+async def seeded_client() -> AsyncIterator[AsyncClient]:
+    """Test client backed by the real curated seed dataset (no fixture rows).
+
+    Exercises the production seed-on-startup path so search works without AI.
+    """
+    await db_mod.close_db()
+    if os.path.exists(_test_db):
+        os.unlink(_test_db)
+
+    # Force the curated seed for this fixture only.
+    with patch.dict(os.environ, {"FREEZEWISE_SKIP_SEED": "0"}):
+        await db_mod.init_db()
+
+    with patch(
+        "freezewise.services.product_ai.ProductAIService.generate",
+        _mock_generate,
+    ):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as ac:
+            yield ac
+
+    await db_mod.close_db()
+    if os.path.exists(_test_db):
+        os.unlink(_test_db)
 
 
 @pytest_asyncio.fixture

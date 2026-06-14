@@ -96,8 +96,8 @@ class ProductRepository:
                 """INSERT OR IGNORE INTO products
                    (name, name_ru, name_cn, category, can_freeze, freeze_months,
                     freeze_how, thaw_how, fridge_days, pantry_days, spoilage_signs,
-                    tips, icon, source, locale)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ai', ?)""",
+                    cold_safe, cold_note, rancid_signs, tips, icon, source, locale)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'ai', ?)""",
                 (
                     product_data["name"],
                     product_data["name_ru"],
@@ -110,6 +110,9 @@ class ProductRepository:
                     product_data["fridge_days"],
                     product_data["pantry_days"],
                     product_data["spoilage_signs"],
+                    product_data.get("cold_safe", "depends"),
+                    product_data.get("cold_note", ""),
+                    product_data.get("rancid_signs", ""),
                     tips_json,
                     product_data["icon"],
                     locale,
@@ -169,6 +172,9 @@ class ProductRepository:
             fridge_days=row["fridge_days"],
             pantry_days=row["pantry_days"],
             spoilage_signs=row["spoilage_signs"],
+            cold_safe=row.get("cold_safe", "depends"),
+            cold_note=row.get("cold_note", ""),
+            rancid_signs=row.get("rancid_signs", ""),
             tips=tips,
             icon=row["icon"],
         )
