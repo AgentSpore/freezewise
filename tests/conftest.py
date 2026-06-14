@@ -15,6 +15,9 @@ from httpx import ASGITransport, AsyncClient
 # Set test DB path before importing app
 _test_db = tempfile.mkstemp(suffix=".db")[1]
 os.environ.setdefault("FREEZEWISE_DB", _test_db)
+# Skip the curated startup seed by default — most tests assert exact counts
+# against the small hand-seeded fixture set. Seed-specific tests opt back in.
+os.environ.setdefault("FREEZEWISE_SKIP_SEED", "1")
 
 import freezewise.database as db_mod  # noqa: E402
 from freezewise.main import app  # noqa: E402
@@ -35,6 +38,9 @@ MOCK_BROCCOLI = {
     "fridge_days": 5,
     "pantry_days": 0,
     "spoilage_signs": "Yellow florets, slimy stems, sulfur smell",
+    "cold_safe": "yes",
+    "cold_note": "Keep refrigerated; tolerates cold well",
+    "rancid_signs": "",
     "tips": ["Store unwashed in loose bag", "Stems are edible", "Blanch before freezing"],
     "icon": "\U0001f966",
 }
@@ -51,6 +57,9 @@ MOCK_CHICKEN = {
     "fridge_days": 2,
     "pantry_days": 0,
     "spoilage_signs": "Slimy, gray color, sour smell",
+    "cold_safe": "yes",
+    "cold_note": "Must stay refrigerated below 4C",
+    "rancid_signs": "",
     "tips": ["Use within 2 days of purchase", "Freeze in portions", "Never refreeze thawed chicken"],
     "icon": "\U0001f357",
 }
@@ -67,6 +76,9 @@ MOCK_MILK = {
     "fridge_days": 7,
     "pantry_days": 0,
     "spoilage_signs": "Sour smell, lumpy texture, yellow tint",
+    "cold_safe": "yes",
+    "cold_note": "Keep refrigerated; do not leave at room temperature",
+    "rancid_signs": "",
     "tips": ["Check date on carton", "Store in back of fridge", "Shake after thawing"],
     "icon": "\U0001f95b",
 }
@@ -83,6 +95,9 @@ MOCK_APPLE = {
     "fridge_days": 30,
     "pantry_days": 7,
     "spoilage_signs": "Soft mushy spots, wrinkled skin, brown discoloration, fermented smell",
+    "cold_safe": "depends",
+    "cold_note": "Refrigeration extends life but not required short-term",
+    "rancid_signs": "",
     "tips": ["Store away from other fruits", "One bad apple spoils the bunch", "Lemon juice prevents browning"],
     "icon": "\U0001f34e",
 }
@@ -123,8 +138,9 @@ async def _seed_test_products() -> None:
                 """INSERT OR IGNORE INTO products
                    (name, name_ru, name_cn, category, can_freeze, freeze_months,
                     freeze_how, thaw_how, fridge_days, pantry_days, spoilage_signs,
+                    cold_safe, cold_note, rancid_signs,
                     tips, icon, source, locale)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'test', 'en')""",
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'test', 'en')""",
                 (
                     product_data["name"],
                     product_data["name_ru"],
@@ -137,11 +153,41 @@ async def _seed_test_products() -> None:
                     product_data["fridge_days"],
                     product_data["pantry_days"],
                     product_data["spoilage_signs"],
+                    product_data.get("cold_safe", "depends"),
+                    product_data.get("cold_note", ""),
+                    product_data.get("rancid_signs", ""),
                     tips_json,
                     product_data["icon"],
                 ),
             )
         await db.commit()
+
+
+@pytest_asyncio.fixture
+async def seeded_client() -> AsyncIterator[AsyncClient]:
+    """Test client backed by the real curated seed dataset (no fixture rows).
+
+    Exercises the production seed-on-startup path so search works without AI.
+    """
+    await db_mod.close_db()
+    if os.path.exists(_test_db):
+        os.unlink(_test_db)
+
+    # Force the curated seed for this fixture only.
+    with patch.dict(os.environ, {"FREEZEWISE_SKIP_SEED": "0"}):
+        await db_mod.init_db()
+
+    with patch(
+        "freezewise.services.product_ai.ProductAIService.generate",
+        _mock_generate,
+    ):
+        transport = ASGITransport(app=app)
+        async with AsyncClient(transport=transport, base_url="http://test") as ac:
+            yield ac
+
+    await db_mod.close_db()
+    if os.path.exists(_test_db):
+        os.unlink(_test_db)
 
 
 @pytest_asyncio.fixture

@@ -121,9 +121,17 @@ export default function ProductDetail() {
             <DetailSection title={t("product.how_to_thaw")} content={product.thaw_how} />
           )}
 
-          {/* Spoilage */}
-          {product.spoilage_signs && (
-            <DetailSection title={t("product.spoilage")} content={product.spoilage_signs} />
+          {/* Eat cold? badge */}
+          {product.cold_safe && (
+            <ColdSafeBadge coldSafe={product.cold_safe} coldNote={product.cold_note} t={t} />
+          )}
+
+          {/* Spoilage / rancidity */}
+          {(product.rancid_signs || product.spoilage_signs) && (
+            <DetailSection
+              title={t("product.rancid_signs")}
+              content={product.rancid_signs || product.spoilage_signs}
+            />
           )}
 
           {/* Tips — pull quotes */}
@@ -241,6 +249,89 @@ function DetailSection({ title, content }: { title: string; content: string }) {
       <p className="mt-1.5 font-sans text-sm leading-relaxed text-neutral-700">
         {content}
       </p>
+    </div>
+  );
+}
+
+const COLD_SAFE_CONFIG = {
+  yes: {
+    badgeClass:
+      "border border-green-200 bg-green-50 px-3 py-1 font-sans text-xs uppercase tracking-wider text-green-700",
+    icon: (
+      <svg
+        aria-hidden="true"
+        className="inline-block h-3.5 w-3.5 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  no: {
+    badgeClass:
+      "border border-amber-200 bg-amber-50 px-3 py-1 font-sans text-xs uppercase tracking-wider text-amber-700",
+    icon: (
+      <svg
+        aria-hidden="true"
+        className="inline-block h-3.5 w-3.5 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  depends: {
+    badgeClass:
+      "border border-neutral-200 bg-neutral-50 px-3 py-1 font-sans text-xs uppercase tracking-wider text-neutral-500",
+    icon: (
+      <svg
+        aria-hidden="true"
+        className="inline-block h-3.5 w-3.5 shrink-0"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <path d="M12 8v4m0 4h.01" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+} as const;
+
+function ColdSafeBadge({
+  coldSafe,
+  coldNote,
+  t,
+}: {
+  coldSafe: "yes" | "no" | "depends";
+  coldNote?: string;
+  t: (key: string) => string;
+}) {
+  const cfg = COLD_SAFE_CONFIG[coldSafe];
+  const label = t(`product.cold_safe.${coldSafe}`);
+  return (
+    <div>
+      <h3 className="font-sans text-[10px] uppercase tracking-[0.2em] text-neutral-400">
+        {t("product.cold_safe")}
+      </h3>
+      <div className="mt-2 flex items-center gap-1.5">
+        <span className={cfg.badgeClass} role="status" aria-label={label}>
+          <span className="inline-flex items-center gap-1">
+            {cfg.icon}
+            {label}
+          </span>
+        </span>
+      </div>
+      {coldNote && (
+        <p className="mt-1.5 font-sans text-sm leading-relaxed text-neutral-700">{coldNote}</p>
+      )}
     </div>
   );
 }

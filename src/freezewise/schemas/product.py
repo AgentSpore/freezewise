@@ -33,6 +33,9 @@ class ProductResponse(BaseModel):
     fridge_days: int
     pantry_days: int
     spoilage_signs: str
+    cold_safe: str  # "yes" | "no" | "depends" — safe to eat straight from the fridge
+    cold_note: str  # short guidance on the cold-safe judgement
+    rancid_signs: str  # for fats/nuts/oils: how rancidity tastes/smells
     tips: list[str]
     icon: str
 
@@ -74,6 +77,9 @@ class ProductAIInput(BaseModel):
     fridge_days: int = Field(default=0, ge=0)
     pantry_days: int = Field(default=0, ge=0)
     spoilage_signs: str
+    cold_safe: str = "depends"
+    cold_note: str = ""
+    rancid_signs: str = ""
     tips: list[str] = Field(default_factory=list)
     icon: str = ""
 
@@ -100,10 +106,19 @@ class ProductAIInput(BaseModel):
         except (ValueError, TypeError):
             return 0
 
-    @field_validator("freeze_how", "thaw_how", mode="before")
+    @field_validator("freeze_how", "thaw_how", "cold_note", "rancid_signs", mode="before")
     @classmethod
     def sanitize_optional_str(cls, v: object) -> str:
         return _sanitize(v) if isinstance(v, str) else ""
+
+    @field_validator("cold_safe", mode="before")
+    @classmethod
+    def normalize_cold_safe(cls, v: object) -> str:
+        if isinstance(v, str):
+            cleaned = v.strip().lower()
+            if cleaned in ("yes", "no", "depends"):
+                return cleaned
+        return "depends"
 
     @field_validator("tips", mode="before")
     @classmethod
