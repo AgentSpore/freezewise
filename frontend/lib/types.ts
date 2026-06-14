@@ -13,6 +13,9 @@ export interface ProductResponse {
   spoilage_signs: string;
   tips: string[];
   icon: string;
+  cold_safe?: "yes" | "no" | "depends";
+  cold_note?: string;
+  rancid_signs?: string;
 }
 
 export interface ProductSearchResponse {
