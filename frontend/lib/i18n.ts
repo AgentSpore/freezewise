@@ -58,6 +58,11 @@ const translations: Record<Locale, Record<string, string>> = {
     "product.quantity": "Quantity",
     "product.added": "Added to fridge",
     "product.storage_guide": "Storage Duration",
+    "product.cold_safe": "Eat cold?",
+    "product.cold_safe.yes": "Safe to eat cold",
+    "product.cold_safe.no": "Heat it first",
+    "product.cold_safe.depends": "Depends",
+    "product.rancid_signs": "How to tell it's gone bad",
 
     // Fridge page
     "fridge.title": "My Fridge",
@@ -235,6 +240,11 @@ const translations: Record<Locale, Record<string, string>> = {
     "product.quantity": "Количество",
     "product.added": "Добавлено в холодильник",
     "product.storage_guide": "Срок хранения",
+    "product.cold_safe": "Есть холодным?",
+    "product.cold_safe.yes": "Можно есть холодным",
+    "product.cold_safe.no": "Сначала разогрейте",
+    "product.cold_safe.depends": "Зависит от блюда",
+    "product.rancid_signs": "Как понять, что испортилось",
 
     "fridge.title": "Мой холодильник",
     "fridge.subtitle": "Отслеживайте свежесть продуктов",
@@ -406,6 +416,11 @@ const translations: Record<Locale, Record<string, string>> = {
     "product.quantity": "数量",
     "product.added": "已添加到冰箱",
     "product.storage_guide": "储存期限",
+    "product.cold_safe": "可以冷食吗？",
+    "product.cold_safe.yes": "可以冷食",
+    "product.cold_safe.no": "请先加热",
+    "product.cold_safe.depends": "视情况而定",
+    "product.rancid_signs": "如何判断已变质",
 
     "fridge.title": "我的冰箱",
     "fridge.subtitle": "追踪食品新鲜度",
