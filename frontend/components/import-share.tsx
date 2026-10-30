@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { decompressFromEncodedURIComponent } from "lz-string";
 import { useLocaleStore, useFridgeStore, useUIStore } from "@/lib/store";
@@ -15,54 +15,75 @@ interface SharedItem {
   q: string; // quantity
 }
 
+function decodeSharedItems(value: string): SharedItem[] | null {
+  try {
+    const decoded = decompressFromEncodedURIComponent(value);
+    if (!decoded) return null;
+    const items: unknown = JSON.parse(decoded);
+    if (!Array.isArray(items) || items.length === 0) return null;
+    const valid = items.every((item) =>
+      item !== null && typeof item === "object" &&
+      typeof item.n === "string" && item.n.trim().length > 0 &&
+      typeof item.c === "string" && typeof item.i === "string" &&
+      typeof item.q === "string" &&
+      ["fridge", "freezer", "pantry"].includes(item.l)
+    );
+    return valid ? items : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ImportShare() {
-  const searchParams = useSearchParams();
+  const shareParam = useSearchParams().get("share");
+  if (!shareParam) return null;
+  const sharedItems = decodeSharedItems(shareParam);
+  return sharedItems ? (
+    <ImportDialog key={shareParam} sharedItems={sharedItems} />
+  ) : null;
+}
+
+function ImportDialog({ sharedItems }: { sharedItems: SharedItem[] }) {
   const router = useRouter();
   const locale = useLocaleStore((s) => s.locale);
   const t = createT(locale);
   const addItem = useFridgeStore((s) => s.addItem);
   const showToast = useUIStore((s) => s.showToast);
-
-  const [sharedItems, setSharedItems] = useState<SharedItem[]>([]);
-  const [showModal, setShowModal] = useState(false);
+  const [closed, setClosed] = useState(false);
   const [importing, setImporting] = useState(false);
-
-  const shareParam = searchParams.get("share");
+  const lifetimeRef = useRef({ valid: false });
 
   useEffect(() => {
-    if (!shareParam) return;
-    try {
-      const decompressed = decompressFromEncodedURIComponent(shareParam);
-      if (!decompressed) return;
-      const parsed = JSON.parse(decompressed) as SharedItem[];
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        setSharedItems(parsed);
-        setShowModal(true);
-      }
-    } catch {
-      // invalid share data, ignore
-    }
-  }, [shareParam]);
+    const lifetime = { valid: true };
+    lifetimeRef.current = lifetime;
+    return () => { lifetime.valid = false; };
+  }, []);
 
   const handleImport = useCallback(async () => {
+    const lifetime = lifetimeRef.current;
+    if (!lifetime.valid) return;
     setImporting(true);
     let imported = 0;
 
     for (const item of sharedItems) {
+      if (!lifetime.valid) return;
       try {
         const result = await searchProducts(item.n, null, locale);
+        if (!lifetime.valid) return;
         if (result.products.length > 0) {
           const product = result.products[0];
           addItem(product, item.l, item.q);
           imported++;
         }
       } catch {
+        if (!lifetime.valid) return;
         // skip failed items
       }
     }
 
+    if (!lifetime.valid) return;
     setImporting(false);
-    setShowModal(false);
+    setClosed(true);
     showToast(`${imported} / ${sharedItems.length} items imported`, "success");
 
     // Remove ?share= from URL
@@ -70,11 +91,12 @@ export default function ImportShare() {
   }, [sharedItems, locale, addItem, showToast, router]);
 
   const handleClose = useCallback(() => {
-    setShowModal(false);
+    lifetimeRef.current.valid = false;
+    setClosed(true);
     router.replace("/fridge");
   }, [router]);
 
-  if (!showModal) return null;
+  if (closed) return null;
 
   return (
     <div
@@ -88,7 +110,7 @@ export default function ImportShare() {
             <h2 className="font-serif text-xl text-neutral-900">{t("share.import_title")}</h2>
             <p className="font-sans text-xs text-neutral-400">{t("share.import_subtitle")}</p>
           </div>
-          <button onClick={handleClose} className="p-2 text-neutral-400 hover:text-neutral-900">
+          <button aria-label={t("common.close")} onClick={handleClose} className="p-2 text-neutral-400 hover:text-neutral-900">
             <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path d="M6 6l12 12M6 18L18 6" strokeLinecap="round" />
             </svg>
